@@ -1,0 +1,71 @@
+{
+    "missing_descriptions": {
+        "missing_descriptions": [
+            "POST /items/",
+            "GET /items/{item_name}",
+            "PUT /items/{item_name}",
+            "DELETE /items/{item_name}",
+            "GET /items/search/{query}",
+            "GET /items/vulnerable_search/",
+            "POST items/add-item"
+        ],
+        "sql_injection_results": [
+            "No SQL Injection vulnerability at http://127.0.0.1:8000/items/.",
+            "Error testing SQL Injection at http://127.0.0.1:8000items/add-item: Failed to parse: http://127.0.0.1:8000items/add-item"
+        ],
+        "xss_results": [
+            "No XSS vulnerability detected at http://127.0.0.1:8000/items/.",
+            "No XSS vulnerability detected at http://127.0.0.1:8000/items/{item_name}.",
+            "No XSS vulnerability detected at http://127.0.0.1:8000/items/{item_name}.",
+            "No XSS vulnerability detected at http://127.0.0.1:8000/items/{item_name}.",
+            "No XSS vulnerability detected at http://127.0.0.1:8000/items/search/{query}.",
+            "Potential XSS vulnerability found at http://127.0.0.1:8000/items/vulnerable_search/.",
+            "Error testing XSS at http://127.0.0.1:8000items/add-item: Failed to parse: http://127.0.0.1:8000items/add-item"
+        ],
+        "open_redirect_results": [
+            "No Open Redirect vulnerability at http://127.0.0.1:8000/items/.",
+            "No Open Redirect vulnerability at http://127.0.0.1:8000/items/{item_name}.",
+            "No Open Redirect vulnerability at http://127.0.0.1:8000/items/{item_name}.",
+            "No Open Redirect vulnerability at http://127.0.0.1:8000/items/{item_name}.",
+            "No Open Redirect vulnerability at http://127.0.0.1:8000/items/search/{query}.",
+            "No Open Redirect vulnerability at http://127.0.0.1:8000/items/vulnerable_search/.",
+            "Error testing Open Redirect at http://127.0.0.1:8000items/add-item: Failed to parse: http://127.0.0.1:8000items/add-item"
+        ],
+        "sensitive_data_exposure_results": [
+            "No Sensitive Data Exposure at http://127.0.0.1:8000/items/.",
+            "No Sensitive Data Exposure at http://127.0.0.1:8000/items/{item_name}.",
+            "No Sensitive Data Exposure at http://127.0.0.1:8000/items/{item_name}.",
+            "No Sensitive Data Exposure at http://127.0.0.1:8000/items/{item_name}.",
+            "No Sensitive Data Exposure at http://127.0.0.1:8000/items/search/{query}.",
+            "No Sensitive Data Exposure at http://127.0.0.1:8000/items/vulnerable_search/.",
+            "Error testing Sensitive Data Exposure at http://127.0.0.1:8000items/add-item: Failed to parse: http://127.0.0.1:8000items/add-item"
+        ],
+        "security_misconfiguration_results": [
+            "Security Misconfiguration found at http://127.0.0.1:8000/items/. Missing headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Strict-Transport-Security",
+            "Security Misconfiguration found at http://127.0.0.1:8000/items/{item_name}. Missing headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Strict-Transport-Security",
+            "Security Misconfiguration found at http://127.0.0.1:8000/items/{item_name}. Missing headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Strict-Transport-Security",
+            "Security Misconfiguration found at http://127.0.0.1:8000/items/{item_name}. Missing headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Strict-Transport-Security",
+            "Security Misconfiguration found at http://127.0.0.1:8000/items/search/{query}. Missing headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Strict-Transport-Security",
+            "Security Misconfiguration found at http://127.0.0.1:8000/items/vulnerable_search/. Missing headers: X-Content-Type-Options, X-Frame-Options, X-XSS-Protection, Strict-Transport-Security",
+            "Error testing Security Misconfiguration at http://127.0.0.1:8000items/add-item: Failed to parse: http://127.0.0.1:8000items/add-item"
+        ],
+        "insecure_deserialization_results": [
+            "No Insecure Deserialization vulnerability at http://127.0.0.1:8000/items/.",
+            "No Insecure Deserialization vulnerability at http://127.0.0.1:8000/items/{item_name}.",
+            "No Insecure Deserialization vulnerability at http://127.0.0.1:8000/items/{item_name}.",
+            "No Insecure Deserialization vulnerability at http://127.0.0.1:8000/items/{item_name}.",
+            "No Insecure Deserialization vulnerability at http://127.0.0.1:8000/items/search/{query}.",
+            "No Insecure Deserialization vulnerability at http://127.0.0.1:8000/items/vulnerable_search/.",
+            "Error testing Insecure Deserialization at http://127.0.0.1:8000items/add-item: Failed to parse: http://127.0.0.1:8000items/add-item"
+        ],
+        "broken_access_control_results": [
+            "No Broken Access Control vulnerability at http://127.0.0.1:8000/items/.",
+            "No Broken Access Control vulnerability at http://127.0.0.1:8000/items/{item_name}.",
+            "No Broken Access Control vulnerability at http://127.0.0.1:8000/items/{item_name}.",
+            "No Broken Access Control vulnerability at http://127.0.0.1:8000/items/{item_name}.",
+            "No Broken Access Control vulnerability at http://127.0.0.1:8000/items/search/{query}.",
+            "No Broken Access Control vulnerability at http://127.0.0.1:8000/items/vulnerable_search/.",
+            "Error testing Broken Access Control at http://127.0.0.1:8000items/add-item: Failed to parse: http://127.0.0.1:8000items/add-item"
+        ]
+    }
+}
