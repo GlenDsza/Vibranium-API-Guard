@@ -1,0 +1,2 @@
+[console_scripts]
+vibranium-sdk = vibranium_sdk.__main__:main

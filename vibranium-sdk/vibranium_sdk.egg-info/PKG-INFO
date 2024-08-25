@@ -1,0 +1,9 @@
+Metadata-Version: 2.1
+Name: vibranium-sdk
+Version: 0.1.0
+Summary: SDK for fetching and testing OpenAPI specs from FastAPI applications
+Author: Om Avhad
+Author-email: omavhad22@gmail.com
+Classifier: Programming Language :: Python :: 3
+Classifier: License :: OSI Approved :: MIT License
+Requires-Dist: requests
