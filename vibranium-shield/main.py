@@ -26,6 +26,9 @@ ALLOWED_IPS = ["127.0.0.1", "::1"]
 # XSS Filtering Pattern
 XSS_PATTERN = re.compile(r'<.*?>')
 
+# SQL Injection Filtering Pattern
+SQLI_PATTERN = re.compile(r'(\'|\")|(--)|(;)|(\b(SELECT|INSERT|DELETE|UPDATE|DROP|UNION|ALTER|CREATE)\b)', re.IGNORECASE)
+
 def rate_limited(ip):
     current_time = time.time()
     if ip not in request_timestamps:
@@ -54,8 +57,10 @@ def is_valid_ip(ip):
     return valid
 
 def sanitize_input(data):
-    """Remove potentially harmful scripts (XSS)."""
-    return XSS_PATTERN.sub("", data)
+    """Remove potentially harmful scripts (XSS) and SQL injection attempts."""
+    sanitized_data = XSS_PATTERN.sub("", data)
+    sanitized_data = SQLI_PATTERN.sub("", sanitized_data)
+    return sanitized_data
 
 @app.before_request
 def filter_ip():
@@ -65,8 +70,8 @@ def filter_ip():
         return Response("Forbidden: Invalid IP Address", status=403)
 
 @app.before_request
-def filter_xss():
-    """Sanitize all incoming data to prevent XSS."""
+def filter_xss_sql_injection():
+    """Sanitize all incoming data to prevent XSS and SQL injection."""
     if request.data:
         sanitized_data = sanitize_input(request.data.decode('utf-8'))
         request._cached_data = sanitized_data.encode('utf-8')
