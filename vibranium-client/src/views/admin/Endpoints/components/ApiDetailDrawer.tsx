@@ -1,4 +1,4 @@
-import { Endpoint } from "@/constants/miscellaneous";
+import { TempEndpoint } from "@/constants/miscellaneous";
 import { Drawer } from "@material-tailwind/react";
 import { useState, type FC } from "react";
 import { BiCollection } from "react-icons/bi";
@@ -19,7 +19,7 @@ import {
 interface ApiDetailDrawerProps {
   open: boolean;
   hide: () => void;
-  endpoint: Endpoint;
+  endpoint: TempEndpoint;
 }
 
 const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
