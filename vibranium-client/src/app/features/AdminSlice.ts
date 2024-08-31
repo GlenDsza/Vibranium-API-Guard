@@ -3,10 +3,10 @@ import axios from "axios";
 
 export interface Admin {
   id: string;
-  admin_name: string;
-  station_name: string;
-  role: string;
-  photo: string;
+  userId: string;
+  name: string;
+  email: string;
+  mobile: string;
 }
 
 interface AdminState {
@@ -18,10 +18,10 @@ interface AdminState {
 const initialState: AdminState = {
   data: {
     id: "",
-    admin_name: "",
-    station_name: "",
-    role: "",
-    photo: "",
+    userId: "",
+    name: "",
+    email: "",
+    mobile: "",
   },
   loading: false,
   error: null,
@@ -29,12 +29,12 @@ const initialState: AdminState = {
 
 export const fetchAdmin = createAsyncThunk(
   "admin/fetch",
-  async (id: string, thunkAPI) => {
+  async (id: string, _thunkAPI) => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/admin/get_admin_by_id?id=${id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/users/${id}`
       );
-      return res.data.SUCCESS;
+      return res.data;
     } catch (error) {
       console.log(error);
       throw error;
@@ -53,16 +53,16 @@ export const AdminSlice = createSlice({
     clearAdmin: (state) => {
       state.data = {
         id: "",
-        admin_name: "",
-        station_name: "",
-        role: "",
-        photo: "",
+        userId: "",
+        name: "",
+        email: "",
+        mobile: "",
       };
       state.error = null;
     },
   },
   extraReducers: (builder) => {
-    builder.addCase(fetchAdmin.pending, (state, action) => {
+    builder.addCase(fetchAdmin.pending, (state, _action) => {
       state.loading = true;
       state.error = null;
     });

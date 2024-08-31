@@ -62,7 +62,7 @@ const Navbar = (props: {
     dispatch(
       readNotification({
         id: id,
-        station_name: admin?.station_name,
+        station_name: admin?.name,
       })
     );
   };
@@ -70,7 +70,7 @@ const Navbar = (props: {
   const handleReadAll = () => {
     dispatch(
       readAllNotifications({
-        station_name: admin?.station_name,
+        station_name: admin?.name,
       })
     );
   };

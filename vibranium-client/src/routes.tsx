@@ -16,6 +16,7 @@ import { SiWechat } from "react-icons/si";
 import { BsFillPeopleFill } from "react-icons/bs";
 import { FaCode } from "react-icons/fa6";
 import Endpoints from "./views/admin/Endpoints";
+import SignUp from "./views/auth/SignUp";
 
 const routes = [
   {
@@ -73,6 +74,13 @@ const routes = [
     path: "sign-in",
     icon: <MdLock className="h-6 w-6" />,
     component: <SignIn />,
+  },
+  {
+    name: "Sign Up",
+    layout: "/auth",
+    path: "sign-up",
+    icon: <MdLock className="h-6 w-6" />,
+    component: <SignUp />,
   },
 ];
 export default routes;

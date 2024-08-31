@@ -36,23 +36,23 @@ export default function Admin(props: Record<string, unknown>) {
 
   useEffect(() => {
     const fetchData = () => {
-      if (!admin || admin.station_name === "") {
+      if (!admin || admin.name === "") {
         fetchAdmin(localStorage.getItem("id") as string);
         return;
       }
       dispatch(
         fetchIncidents({
-          stationName: admin.station_name,
+          stationName: admin.name,
         })
       );
       dispatch(
         fetchStaff({
-          stationName: admin.station_name,
+          stationName: admin.name,
         })
       );
       dispatch(
         fetchNotifications({
-          stationName: admin.station_name,
+          stationName: admin.name,
         })
       );
     };

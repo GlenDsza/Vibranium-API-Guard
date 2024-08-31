@@ -4,11 +4,12 @@ import Card from "@/components/card";
 import { useState, ChangeEvent, FormEvent } from "react";
 // import axios from "axios";
 import { NavigateFunction, useNavigate } from "react-router-dom";
-// import { useAppDispatch } from "@/app/store";
-// import { setAdmin } from "@/app/features/AdminSlice";
+import axios from "axios";
+import { useAppDispatch } from "@/app/store";
+import { setAdmin } from "@/app/features/AdminSlice";
 
 export default function SignIn() {
-  // const dispatch = useAppDispatch();
+  const dispatch = useAppDispatch();
   const navigate: NavigateFunction = useNavigate();
   const [loggedIn, setLoggedIn] = useState(false);
   const [formData, setFormData] = useState({
@@ -52,23 +53,23 @@ export default function SignIn() {
 
     if (!newErrors.eid && !newErrors.password) {
       const formData = {
-        id: eid,
+        userId: eid,
         password: password,
       };
 
       try {
-        // const res = await axios.post(
-        //   `${import.meta.env.VITE_BACKEND_URL}/auth/admin`,
-        //   formData
-        // );
+        const res = await axios.post(
+          `${import.meta.env.VITE_BACKEND_URL}/api/auth/login`,
+          formData
+        );
 
-        if (true) {
+        if (res.status === 200) {
           if (loggedIn) {
             localStorage.setItem("persist", "true");
           }
-          localStorage.setItem("id", formData.id);
-          localStorage.setItem("role", "ADMIN");
-          // dispatch(setAdmin(res.data.SUCCESS));
+          localStorage.setItem("id", formData.userId);
+          localStorage.setItem("name", res.data.name);
+          dispatch(setAdmin(res.data));
           navigate("/admin/dashboard");
         } else setErrors({ eid: "", password: "Invalid Credentials" });
       } catch (ex) {
@@ -90,7 +91,7 @@ export default function SignIn() {
           <InputField
             variant="auth"
             extra="mb-5"
-            label="Admin ID"
+            label="User ID"
             placeholder="E.g. ABCD1234"
             id="eid"
             type="text"
@@ -137,6 +138,16 @@ export default function SignIn() {
           >
             Sign In
           </button>
+
+          <div className="mt-4 text-center text-sm text-navy-700 dark:text-white">
+            Don't have an account?{" "}
+            <a
+              className="text-brand-500 hover:text-brand-600 dark:text-white"
+              href="/auth/sign-up"
+            >
+              Sign Up
+            </a>
+          </div>
         </form>
       </Card>
     </div>
