@@ -4,6 +4,17 @@ import TableSkeleton from "@/components/skeleton/TableSkeleton";
 
 const threats: any[] = [
   {
+    endpoint: "60b8d295f3e28c001c8e4b3e",
+    path: "/products/{productId}",
+    method: "GET",
+    name: "Cross-Site Scripting (XSS)",
+    description: "XSS vulnerability detected.",
+    type: "Scripting",
+    severity: "Medium",
+    recommendations: "Sanitize user inputs.",
+    status: "Pending",
+  },
+  {
     endpoint: "60b8d295f3e28c001c8e4b3d",
     path: "/products/{productId}",
     method: "GET",
@@ -15,14 +26,13 @@ const threats: any[] = [
     status: "Pending",
   },
   {
-    endpoint: "60b8d295f3e28c001c8e4b3e",
-    path: "/products/{productId}",
-    method: "GET",
-    name: "Cross-Site Scripting (XSS)",
-    description: "XSS vulnerability detected.",
-    type: "Scripting",
+    endpoint: "60b8d295f3e28c001c8e4b3f",
+    path: "/orders/{orderId}",
+    method: "PUT",
+    name: "Broken Access Control",
+    description: "Insecure access to sensitive data detected.",
+    type: "BOAC",
     severity: "Medium",
-    recommendations: "Sanitize user inputs.",
     status: "Pending",
   },
   {
