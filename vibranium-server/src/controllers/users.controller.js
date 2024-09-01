@@ -12,7 +12,8 @@ export const getSingleUser = async (req, res) => {
 
 export const getAllUsers = async (req, res) => {
   try {
-    const users = await User.find();
+    // dont return password, createdAt, updatedAt
+    const users = await User.find().select("-password -createdAt -updatedAt");
     res.json(users);
   } catch (error) {
     return res.status(500).json({ message: error.message });

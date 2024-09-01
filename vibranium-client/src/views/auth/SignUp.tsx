@@ -2,6 +2,7 @@ import InputField from "@/components/fields/InputField";
 import Card from "@/components/card";
 import { useState, ChangeEvent, FormEvent } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 
 export default function SignUp() {
   const [formData, setFormData] = useState({
@@ -69,16 +70,12 @@ export default function SignUp() {
         mobile: mobile,
       };
 
-      console.log(formData);
-
-      const res = await axios.post(
+      await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/auth/register`,
         formData
       );
 
-      console.log(res);
-
-      // Add your sign-up logic here
+      toast.success("Account created successfully!");
     }
   };
 

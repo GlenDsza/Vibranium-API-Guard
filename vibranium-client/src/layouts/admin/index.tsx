@@ -6,7 +6,7 @@ import Footer from "@/components/footer/Footer";
 import routes from "@/routes";
 import { fetchAdmin } from "@/app/features/AdminSlice";
 import { useAppDispatch, useAppSelector } from "@/app/store";
-import { fetchStaff } from "@/app/features/StaffSlice";
+import { fetchTeam } from "@/app/features/TeamSlice";
 import { fetchIncidents } from "@/app/features/IncidentSlice";
 import { fetchNotifications } from "@/app/features/NotificationSlice";
 
@@ -45,11 +45,7 @@ export default function Admin(props: Record<string, unknown>) {
           stationName: admin.name,
         })
       );
-      dispatch(
-        fetchStaff({
-          stationName: admin.name,
-        })
-      );
+      dispatch(fetchTeam());
       dispatch(
         fetchNotifications({
           stationName: admin.name,

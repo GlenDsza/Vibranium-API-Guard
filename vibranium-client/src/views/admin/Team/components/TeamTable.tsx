@@ -1,9 +1,8 @@
-import { useReducer, useState } from "react";
+import { useState } from "react";
 import Card from "@/components/card";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import { AiOutlinePlus } from "react-icons/ai";
 import { FiSearch } from "react-icons/fi";
-import { GoDotFill } from "react-icons/go";
 import avatar from "@/assets/img/defaultAvatar.jpg";
 
 import {
@@ -26,6 +25,7 @@ import {
   compareItems,
 } from "@tanstack/match-sorter-utils";
 import Pagination from "@/components/pagination/Pagination";
+import { FaUser, FaUserShield } from "react-icons/fa6";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -56,14 +56,17 @@ const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
 };
 
 type RowObj = {
-  staff_name: string;
-  id: string;
-  phone: string;
+  _id: string;
+  userId: string;
+  name: string;
+  email: string;
+  mobile: string;
   photo: string;
-  status: string;
+  role: string | undefined;
 };
 
-function StaffTable(props: { tableData: any }) {
+function TeamTable(props: { tableData: any }) {
+  const userId = localStorage.getItem("id");
   const columnHelper = createColumnHelper<RowObj>();
   const navigate: NavigateFunction = useNavigate();
   const { tableData } = props;
@@ -75,14 +78,14 @@ function StaffTable(props: { tableData: any }) {
       header: () => (
         <p className="text-sm font-bold text-gray-600 dark:text-white"></p>
       ),
-      cell: (info: any) => (
+      cell: (_info) => (
         <div className="h-[30px] w-[30px] rounded-full">
           <img src={avatar} className="h-full w-full rounded-full" alt="" />
         </div>
       ),
     }),
-    columnHelper.accessor("staff_name", {
-      id: "staff_name",
+    columnHelper.accessor("name", {
+      id: "name",
       filterFn: "fuzzy",
       sortingFn: fuzzySort,
       header: () => (
@@ -97,11 +100,11 @@ function StaffTable(props: { tableData: any }) {
       ),
     }),
 
-    columnHelper.accessor("id", {
-      id: "id",
+    columnHelper.accessor("userId", {
+      id: "userId",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
-          EMPLOYEE ID
+          USER ID
         </p>
       ),
       cell: (info) => (
@@ -110,8 +113,8 @@ function StaffTable(props: { tableData: any }) {
         </p>
       ),
     }),
-    columnHelper.accessor("phone", {
-      id: "phone",
+    columnHelper.accessor("mobile", {
+      id: "mobile",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
           CONTACT NO.
@@ -123,32 +126,39 @@ function StaffTable(props: { tableData: any }) {
         </p>
       ),
     }),
-    columnHelper.accessor("status", {
-      id: "status",
+    columnHelper.accessor("email", {
+      id: "email",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
-          STATUS
+          EMAIL
         </p>
       ),
       cell: (info) => (
-        <div className="flex items-center justify-start">
-          <GoDotFill
-            className={`me-1 ${
-              info.getValue() === "Available"
-                ? "text-green-500 dark:text-green-300"
-                : "text-amber-500 dark:text-amber-300"
-            } `}
-          />
-          <p className="text-md font-medium text-gray-600 dark:text-white">
-            {info.getValue()}
+        <p className="text-sm font-bold text-navy-700 dark:text-white">
+          {info.getValue()}
+        </p>
+      ),
+    }),
+    columnHelper.accessor("userId", {
+      id: "role",
+      header: () => (
+        <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
+          ROLE (ACCESS)
+        </p>
+      ),
+      cell: (info) => (
+        <div className="flex items-center justify-start gap-3">
+          {userId === info.getValue() ? <FaUserShield size={20} /> : <FaUser />}
+
+          <p className="text-md font-medium text-gray-600 dark:text-white mt-1">
+            {userId === info.getValue() ? "Admin" : "Member"}
           </p>
         </div>
       ),
     }),
   ]; // eslint-disable-next-line
-  const rerender = useReducer(() => ({}), {})[1];
   const [globalFilter, setGlobalFilter] = useState<string>("");
-  const [data, setData] = useState<any>(() => [...defaultData]);
+  const [data] = useState<any>(() => [...defaultData]);
 
   const table = useReactTable({
     data,
@@ -173,7 +183,7 @@ function StaffTable(props: { tableData: any }) {
     <Card extra={"w-full h-full sm:overflow-auto px-6"}>
       <header className="relative flex items-center justify-between pt-4">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-          Staff Table
+          Team Table
         </div>
         <div className="flex items-center justify-between">
           <div className="flex h-full min-h-[32px] items-center rounded-lg bg-lightPrimary text-navy-700 dark:bg-navy-900 dark:text-white xl:w-[225px]">
@@ -190,7 +200,7 @@ function StaffTable(props: { tableData: any }) {
           </div>
           <button
             onClick={() => {
-              navigate("/station-admin/staff");
+              navigate("/admin/team");
             }}
             className={` linear mx-1 flex items-center justify-center rounded-lg bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
@@ -261,4 +271,4 @@ function StaffTable(props: { tableData: any }) {
   );
 }
 
-export default StaffTable;
+export default TeamTable;

@@ -2,11 +2,11 @@ import InputField from "@/components/fields/InputField";
 import Checkbox from "@/components/checkbox";
 import Card from "@/components/card";
 import { useState, ChangeEvent, FormEvent } from "react";
-// import axios from "axios";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 import axios from "axios";
 import { useAppDispatch } from "@/app/store";
 import { setAdmin } from "@/app/features/AdminSlice";
+import { toast } from "react-toastify";
 
 export default function SignIn() {
   const dispatch = useAppDispatch();
@@ -64,6 +64,7 @@ export default function SignIn() {
         );
 
         if (res.status === 200) {
+          toast.success("Logged in successfully!");
           if (loggedIn) {
             localStorage.setItem("persist", "true");
           }
