@@ -32,7 +32,7 @@ export const fetchAdmin = createAsyncThunk(
   async (id: string, _thunkAPI) => {
     try {
       const res = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/users/${id}`
+        `${import.meta.env.VITE_BACKEND_URL}/api/users?userId=${id}`
       );
       return res.data;
     } catch (error) {

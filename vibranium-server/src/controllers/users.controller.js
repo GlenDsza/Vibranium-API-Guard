@@ -3,7 +3,7 @@ import User from "../models/user.model.js";
 export const getUsers = async (req, res) => {
   const { userId, organization } = req.query;
   let wherePayload = {};
-
+  console.log({ userId, organization });
   if (userId) {
     wherePayload = { ...wherePayload, userId };
   }

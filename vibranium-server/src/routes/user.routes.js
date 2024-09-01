@@ -8,7 +8,7 @@ import { auth } from "../middlewares/auth.middleware.js";
 
 const router = Router();
 
-router.get("/", auth, getUsers);
+router.get("/", getUsers);
 router.delete("/:userId", auth, deleteSingleUser);
 router.delete("/", auth, deleteAllUsers);
 

@@ -21,17 +21,24 @@ const initialState: TeamState = {
   error: null,
 };
 
-export const fetchTeam = createAsyncThunk("team/fetch", async (_thunkAPI) => {
-  try {
-    const res = await axios.get(
-      `${import.meta.env.VITE_BACKEND_URL}/api/users`
-    );
-    return res.data;
-  } catch (error) {
-    console.log(error);
-    throw error;
+export const fetchTeam = createAsyncThunk(
+  "team/fetch",
+  async (payload: { organization: string }, _thunkAPI) => {
+    const { organization } = payload;
+    try {
+      const res = await axios.get(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/users?organization=${organization}`
+      );
+      console.log(res.data);
+      return res.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
   }
-});
+);
 
 export const TeamSlice = createSlice({
   name: "team",
