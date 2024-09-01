@@ -1,12 +1,11 @@
 name: Use Vibranium Action
-
 on:
   push:
     branches:
       - main  # Trigger this workflow on pushes to the main branch
 
 jobs:
-  transfer_spec:
+  build:
     runs-on: ubuntu-latest
 
     steps:
