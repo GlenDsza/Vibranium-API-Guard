@@ -26,6 +26,7 @@ import {
 } from "@tanstack/match-sorter-utils";
 import Pagination from "@/components/pagination/Pagination";
 import { FaUser, FaUserShield } from "react-icons/fa6";
+import { BiCircle } from "react-icons/bi";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -56,13 +57,15 @@ const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
 };
 
 type RowObj = {
-  _id: string;
-  userId: string;
+  endpoint: string;
+  path: string;
+  method: string;
   name: string;
-  email: string;
-  mobile: string;
-  photo: string;
-  role: string | undefined;
+  description: string;
+  type: string;
+  severity: string;
+  recommendations: string;
+  status: string;
 };
 
 function ThreatTable(props: { tableData: any }) {
@@ -73,14 +76,27 @@ function ThreatTable(props: { tableData: any }) {
   const [sorting, setSorting] = useState<SortingState>([]);
   let defaultData = tableData;
   const columns = [
-    columnHelper.accessor("photo", {
-      id: "photo",
+    columnHelper.accessor("severity", {
+      id: "severity",
       header: () => (
-        <p className="text-sm font-bold text-gray-600 dark:text-white"></p>
+        <p className="text-sm font-bold text-gray-600 dark:text-white">
+          {" "}
+          SEVERITY
+        </p>
       ),
-      cell: (_info) => (
-        <div className="h-[30px] w-[30px] rounded-full">
-          <img src={avatar} className="h-full w-full rounded-full" alt="" />
+      cell: (info) => (
+        <div
+          className={`h-full w-[80px] rounded-full ${
+            info.getValue() === "High"
+              ? "bg-red-500"
+              : info.getValue() === "Medium"
+              ? "bg-yellow-500"
+              : "bg-green-500"
+          }`}
+        >
+          <p className="text-sm font-bold text-white flex items-center justify-center">
+            {info.getValue()}
+          </p>
         </div>
       ),
     }),
@@ -90,21 +106,39 @@ function ThreatTable(props: { tableData: any }) {
       sortingFn: fuzzySort,
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
-          NAME
+          THREAT
         </p>
       ),
       cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
-          @{info.getValue()}
+          {info.getValue()}
         </p>
       ),
     }),
 
-    columnHelper.accessor("userId", {
-      id: "userId",
+    columnHelper.accessor("method", {
+      id: "method",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
-          USER ID
+          METHOD
+        </p>
+      ),
+      cell: (info) => (
+        <div
+          className="flex items-center justify-start rounded-md bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
+           hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10 w-[75%] ps-2"
+        >
+          <p className="text-sm font-bold text-navy-700 dark:text-white">
+            {info.getValue().toUpperCase()}
+          </p>
+        </div>
+      ),
+    }),
+    columnHelper.accessor("path", {
+      id: "path",
+      header: () => (
+        <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
+          PATH
         </p>
       ),
       cell: (info) => (
@@ -113,46 +147,41 @@ function ThreatTable(props: { tableData: any }) {
         </p>
       ),
     }),
-    columnHelper.accessor("mobile", {
-      id: "mobile",
+    columnHelper.accessor("status", {
+      id: "status",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
-          CONTACT NO.
+          STATUS
         </p>
       ),
       cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
-          {info.getValue()}
+          {info.getValue() === "Pending" ? (
+            <div className="flex gap-3">
+              <BiCircle size={20} className="text-yellow-500" />
+              {info.getValue()}
+            </div>
+          ) : (
+            <div className="flex gap-3">
+              <BiCircle size={20} className="text-green-500" />
+              {info.getValue()}
+            </div>
+          )}
         </p>
       ),
     }),
-    columnHelper.accessor("email", {
-      id: "email",
-      header: () => (
-        <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
-          EMAIL
-        </p>
-      ),
-      cell: (info) => (
-        <p className="text-sm font-bold text-navy-700 dark:text-white">
-          {info.getValue()}
-        </p>
-      ),
-    }),
-    columnHelper.accessor("userId", {
+    columnHelper.accessor("status", {
       id: "role",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
-          ROLE (ACCESS)
+          Actions
         </p>
       ),
       cell: (info) => (
         <div className="flex items-center justify-start gap-3">
-          {userId === info.getValue() ? <FaUserShield size={20} /> : <FaUser />}
-
-          <p className="text-md font-medium text-gray-600 dark:text-white mt-1">
-            {userId === info.getValue() ? "Admin" : "Member"}
-          </p>
+          <button className="bg-navy-50 p-2 rounded-lg flex">
+            {info.getValue() === "Pending" ? "Resolve" : "Reopen"}
+          </button>
         </div>
       ),
     }),
@@ -183,7 +212,7 @@ function ThreatTable(props: { tableData: any }) {
     <Card extra={"w-full h-full sm:overflow-auto px-6"}>
       <header className="relative flex items-center justify-between pt-4">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-          Team Table
+          Threats Table
         </div>
         <div className="flex items-center justify-between">
           <div className="flex h-full min-h-[32px] items-center rounded-lg bg-lightPrimary text-navy-700 dark:bg-navy-900 dark:text-white xl:w-[225px]">
