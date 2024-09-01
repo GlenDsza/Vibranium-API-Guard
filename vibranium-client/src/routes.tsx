@@ -13,10 +13,12 @@ import { MdHome, MdLock, MdReport } from "react-icons/md";
 import { BiCollection } from "react-icons/bi";
 import { FaRegCirclePlay } from "react-icons/fa6";
 import { SiWechat } from "react-icons/si";
+import { FaGlobeAfrica } from "react-icons/fa";
 import { BsFillPeopleFill } from "react-icons/bs";
 import { FaCode } from "react-icons/fa6";
 import Endpoints from "./views/admin/Endpoints";
 import SignUp from "./views/auth/SignUp";
+import Traffic from "./views/admin/Traffic";
 
 const routes = [
   {
@@ -25,6 +27,13 @@ const routes = [
     path: "dashboard",
     icon: <MdHome className="h-6 w-6" />,
     component: <Dashboard />,
+  },
+  {
+    name: "Traffic",
+    layout: "/admin",
+    path: "traffic",
+    icon: <FaGlobeAfrica className="h-6 w-6" />,
+    component: <Traffic />,
   },
   {
     name: "API Collection",
