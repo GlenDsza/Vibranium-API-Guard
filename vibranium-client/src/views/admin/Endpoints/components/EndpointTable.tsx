@@ -18,6 +18,7 @@ import { Parameter } from "@/app/features/EndpointSlice";
 import { Schema, Threat } from "@/utils/interfaces";
 import { FaInfo } from "react-icons/fa";
 import { enableEndpointApi } from "@/apis/endpoints";
+import { toast } from "react-toastify";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -70,7 +71,7 @@ type RowObj = {
   actions: string | undefined;
 };
 
-const EndpointTable = (props: { tableData: any }) => {
+const EndpointTable = (props: { tableData: any, onOpen: any }) => {
   const columnHelper = createColumnHelper<RowObj>();
   const { tableData } = props;
 
@@ -97,6 +98,8 @@ const EndpointTable = (props: { tableData: any }) => {
           return item;
         });
         _(updatedData);
+        const toastmessage = enable ? "Enabled" : "Disabled";
+        toast.success("Endpoint " + toastmessage + " Successfully");
       }
     });
   };
@@ -331,6 +334,7 @@ const EndpointTable = (props: { tableData: any }) => {
           endpoint={selectedRow}
           open={showDrawer}
           hide={() => setShowDrawer(false)}
+          onOpen={props.onOpen}
         />
       )}
     </>
