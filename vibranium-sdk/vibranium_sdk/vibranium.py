@@ -11,6 +11,9 @@ class VibraniumSDK:
         try:
             response = requests.get(self.openapi_url)
             response.raise_for_status()  # Raise an exception for HTTP errors
+            # save the response to a file
+            with open("openapi.json", "w") as f:
+                f.write(json.dumps(response.json(), indent=4))
             return response.json()
         except requests.RequestException as e:
             print(f"Error fetching OpenAPI spec: {e}")
@@ -43,6 +46,7 @@ class VibraniumSDK:
         payload = "<script>alert('XSS')</script>"
         try:
             # Test with GET request
+            print(url)
             response = requests.get(url, params={"query": payload})
             if payload in response.text:
                 return f"Potential XSS vulnerability found at {url}."
@@ -162,15 +166,22 @@ class VibraniumSDK:
 
         return results
 
-    def generate_report(self, missing_descriptions):
+    def generate_report(self, results):
         """Generates a report based on the results of the tests."""
-        report = {
-            "missing_descriptions": missing_descriptions,
-            # Add other test results here
-        }
-        with open("test_report.json", "w") as report_file:
-            json.dump(report, report_file, indent=4)
-        print("Report generated: test_report.json")
+        report = results
+        # create HTML
+        with open("test_report.html", "w") as report_file:
+            report_file.write("<html><head><title>Test Report</title></head><body>")
+            for category, tests in report.items():
+                report_file.write(f"<h2>{category.replace('_', ' ').title()}</h2>")
+                if not tests:
+                    report_file.write("<p>No issues found.</p>")
+                else:
+                    report_file.write("<ul>")
+                    for test in tests:
+                        report_file.write(f"<li>{test}</li>")
+                    report_file.write("</ul>")
+            report_file.write("</body></html>")
 
     def run(self):
         """Main method to fetch the spec, perform tests, and generate a report."""
