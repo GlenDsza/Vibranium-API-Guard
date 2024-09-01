@@ -27,6 +27,11 @@ const endpointSchema = new mongoose.Schema(
     summary: { type: String, required: true },
     operationId: { type: String, required: true },
     enabled: { type: Boolean, required: true, default: true },
+    organization: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      default: "66d3f5019ce5c53aeb973d6e",
+    },
     parameters: [parameterSchema],
     requestBody: {
       content: {

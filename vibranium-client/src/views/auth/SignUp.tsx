@@ -68,6 +68,7 @@ export default function SignUp() {
         email: email,
         name: name,
         mobile: mobile,
+        organization: "66d3f5019ce5c53aeb973d6e",
       };
 
       await axios.post(

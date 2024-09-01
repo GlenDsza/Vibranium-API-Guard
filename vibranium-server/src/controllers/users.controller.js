@@ -1,20 +1,19 @@
 import User from "../models/user.model.js";
 
-export const getSingleUser = async (req, res) => {
-  try {
-    const user = await User.findOne({ userId: req.params.userId });
-    if (!user) return res.status(404).json({ message: "User not found" });
-    return res.json(user);
-  } catch (error) {
-    return res.status(500).json({ message: error.message });
-  }
-};
+export const getUsers = async (req, res) => {
+  const { userId, organization } = req.query;
+  let wherePayload = {};
 
-export const getAllUsers = async (req, res) => {
+  if (userId) {
+    wherePayload = { ...wherePayload, userId };
+  }
+  if (organization) {
+    wherePayload = { ...wherePayload, organization };
+  }
+
   try {
-    // dont return password, createdAt, updatedAt
-    const users = await User.find().select("-password -createdAt -updatedAt");
-    res.json(users);
+    const users = await User.find(wherePayload).populate("organization");
+    return res.status(200).json(users);
   } catch (error) {
     return res.status(500).json({ message: error.message });
   }

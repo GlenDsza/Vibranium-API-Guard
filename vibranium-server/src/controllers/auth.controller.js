@@ -6,7 +6,7 @@ import { createAccessToken } from "../libs/jwt.js";
 
 export const register = async (req, res) => {
   try {
-    const { userId, name, email, mobile, password } = req.body;
+    const { userId, name, email, mobile, password, organization } = req.body;
 
     const userFound = await User.findOne({ userId });
 
@@ -25,6 +25,7 @@ export const register = async (req, res) => {
       name,
       mobile,
       password: passwordHash,
+      organization,
     });
 
     // saving the user in the database
@@ -55,8 +56,10 @@ export const register = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { userId, password } = req.body;
-    const userFound = await User.findOne({ userId });
+    const { userId, password, organization } = req.body;
+    const userFound = await User.findOne({ userId, organization }).populate(
+      "organization"
+    );
 
     if (!userFound)
       return res.status(400).json({
@@ -87,6 +90,7 @@ export const login = async (req, res) => {
       name: userFound.name,
       mobile: userFound.mobile,
       email: userFound.email,
+      organization: userFound.organization,
     });
   } catch (error) {
     return res.status(500).json({ message: error.message });
@@ -100,7 +104,7 @@ export const verifyToken = async (req, res) => {
   jwt.verify(token, TOKEN_SECRET, async (error, user) => {
     if (error) return res.sendStatus(401);
 
-    const userFound = await User.findById(user.id);
+    const userFound = await User.findById(user.id).populate("organization");
     if (!userFound) return res.sendStatus(401);
 
     return res.json({
@@ -109,6 +113,7 @@ export const verifyToken = async (req, res) => {
       name: userFound.name,
       mobile: userFound.mobile,
       email: userFound.email,
+      organization: userFound.organization,
     });
   });
 };

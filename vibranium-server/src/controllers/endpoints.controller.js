@@ -46,6 +46,7 @@ export const ingestEndpoints = async (req, res) => {
           type: schema.type || "object",
           properties,
           required: schema.required || [],
+          organization: "66d3f5019ce5c53aeb973d6e",
         };
 
         // create new schema or update existing one
@@ -68,6 +69,7 @@ export const ingestEndpoints = async (req, res) => {
             method,
             summary: details.summary || "",
             operationId: details.operationId || "",
+            organization: "66d3f5019ce5c53aeb973d6e",
             parameters: details.parameters
               ? details.parameters.map((param) => ({
                   name: param.name,

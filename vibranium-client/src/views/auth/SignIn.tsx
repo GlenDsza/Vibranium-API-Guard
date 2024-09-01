@@ -55,6 +55,7 @@ export default function SignIn() {
       const formData = {
         userId: eid,
         password: password,
+        organization: "66d3f5019ce5c53aeb973d6e",
       };
 
       try {
@@ -70,6 +71,7 @@ export default function SignIn() {
           }
           localStorage.setItem("id", formData.userId);
           localStorage.setItem("name", res.data.name);
+          localStorage.setItem("organization", res.data.organization._id);
           dispatch(setAdmin(res.data));
           navigate("/admin/dashboard");
         } else setErrors({ eid: "", password: "Invalid Credentials" });
