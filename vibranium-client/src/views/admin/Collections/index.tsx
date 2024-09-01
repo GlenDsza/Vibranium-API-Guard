@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FiSearch } from "react-icons/fi";
 import SortMenu from "./components/Dropdown";
 import { FaPlus } from "react-icons/fa";
@@ -9,6 +9,11 @@ import {
 } from "@material-tailwind/react";
 
 import { BiCollection } from "react-icons/bi";
+import { useDisclosure } from "@chakra-ui/hooks";
+import CollectionModal from "./components/CollectionModal";
+import axios from "axios";
+import { toast } from "react-toastify";
+import EndpointTable from "../Endpoints/components/EndpointTable";
 
 interface Collection {
   name: string;
@@ -21,27 +26,10 @@ interface Collection {
 }
 
 const Collections = () => {
-  const collections: Collection[] = [
-    {
-      name: "Example Collection 1",
-      description: "This is an example collection",
-      tags: "example, test",
-      endpoints: ["66d3f5a10220c8952a1c9f13", "66d3f5a10220c8952a1c9f14"],
-      organization: "66d3f5019ce5c53aeb973d6e",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-    {
-      name: "Example Collection 2",
-      description: "This is another example collection",
-      endpoints: ["66d3f5a10220c8952a1c9f15"],
-      organization: "66d3f5019ce5c53aeb973d6e",
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ];
+  const { isOpen, onOpen, onClose } = useDisclosure();
   const [searchTxt, setSearchTxt] = useState<string>("");
   const [accOpen, setAccOpen] = useState<number>(0);
+  const [collections, setCollections] = useState<Collection[]>([]);
   const handleOpen = (value: number) =>
     setAccOpen(accOpen === value ? 0 : value);
 
@@ -65,6 +53,30 @@ const Collections = () => {
       </svg>
     );
   }
+
+  const handleCreateCollection = async (data: any): Promise<void> => {
+    const res = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/api/collections`,
+      data
+    );
+    console.log(res.data);
+    toast.success("Collection Created Successfully");
+    await getCollections();
+  };
+
+  const getCollections = async (): Promise<Collection[]> => {
+    const res = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/api/collections`
+    );
+    setCollections(res.data);
+    return res.data;
+  };
+
+  useEffect(() => {
+    getCollections().then((data) => {
+      setCollections(data);
+    });
+  }, []);
 
   return (
     <div>
@@ -94,7 +106,7 @@ const Collections = () => {
           {/* Create Button */}
 
           <button
-            onClick={() => {}}
+            onClick={onOpen}
             className={`flex h-full items-center  bg-white text-brand-400 ease-in-out dark:bg-navy-900 dark:text-white p-4 rounded-lg text-lg font-bold border-brand-400 px-6`}
             style={{
               borderWidth: "1px",
@@ -121,15 +133,22 @@ const Collections = () => {
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
               >
-                <p className="font-bold ms-3 flex gap-4 items-center">
+                <p className="ms-3 flex gap-4 items-center">
                   <BiCollection className="h-6 w-6 " /> {item.name}
                 </p>
               </AccordionHeader>
-              <AccordionBody>body 1</AccordionBody>
+              <AccordionBody>
+                <EndpointTable tableData={item.endpoints} />
+              </AccordionBody>
             </Accordion>
           </>
         ))}
       </div>
+      <CollectionModal
+        onClose={onClose}
+        isOpen={isOpen}
+        createCollection={handleCreateCollection}
+      />
     </div>
   );
 };
