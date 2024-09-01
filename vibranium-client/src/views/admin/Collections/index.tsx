@@ -135,6 +135,7 @@ const Collections = () => {
               >
                 <p className="ms-3 flex gap-4 items-center">
                   <BiCollection className="h-6 w-6 " /> {item.name}
+                  {item.name==="Orders Collection" && <span className="text-xs bg-brand-400 text-white px-2 py-1 rounded-full">New</span>}
                 </p>
               </AccordionHeader>
               <AccordionBody>
