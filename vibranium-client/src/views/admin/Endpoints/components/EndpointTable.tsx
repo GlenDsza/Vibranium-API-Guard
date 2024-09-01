@@ -18,6 +18,7 @@ import { Parameter } from "@/app/features/EndpointSlice";
 import { Schema, Threat } from "@/utils/interfaces";
 import { FaInfo } from "react-icons/fa";
 import { enableEndpointApi } from "@/apis/endpoints";
+import { toast } from "react-toastify";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -97,6 +98,8 @@ const EndpointTable = (props: { tableData: any, onOpen: any }) => {
           return item;
         });
         _(updatedData);
+        const toastmessage = enable ? "Enabled" : "Disabled";
+        toast.success("Endpoint " + toastmessage + " Successfully");
       }
     });
   };
