@@ -7,6 +7,7 @@ import authRoutes from "./routes/auth.routes.js";
 import taksRoutes from "./routes/tasks.routes.js";
 import userRoutes from "./routes/user.routes.js";
 import endpointsRoutes from "./routes/endpoints.routes.js";
+import threatsRoutes from "./routes/threats.routes.js";
 import { FRONTEND_URL } from "./config.js";
 
 const app = express();
@@ -24,6 +25,7 @@ app.use(cookieParser());
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api/endpoints", endpointsRoutes);
-app.use("/api", taksRoutes);
+app.use("/api/threats", threatsRoutes);
+app.use("/api/tasks", taksRoutes);
 
 export default app;

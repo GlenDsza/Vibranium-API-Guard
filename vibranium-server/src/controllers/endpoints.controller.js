@@ -4,24 +4,21 @@ import Schema from "../models/schema.model.js";
 export const getEndpoints = async (req, res) => {
   const { id, path } = req.query;
 
+  let wherePayload = {};
+
   if (id) {
-    // Get endpoint by ID
-    const endpoint = await Endpoint.findById(id);
-    if (!endpoint) {
-      return res.status(404).json({ message: "Endpoint not found" });
-    }
-    return res.json(endpoint);
-  } else if (path) {
-    // Get endpoint by path
-    const endpoint = await Endpoint.findOne({ path });
-    if (!endpoint) {
-      return res.status(404).json({ message: "Endpoint not found" });
-    }
-    return res.json(endpoint);
-  } else {
-    // Get all endpoints
-    const endpoints = await Endpoint.find();
+    wherePayload = { ...wherePayload, _id: id };
+  }
+  if (path) {
+    wherePayload = { ...wherePayload, path };
+  }
+
+  try {
+    const endpoints = await Endpoint.find(wherePayload);
     return res.json(endpoints);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Error getting endpoints", error });
   }
 };
 
@@ -152,5 +149,73 @@ export const ingestEndpoints = async (req, res) => {
     res
       .status(500)
       .send({ message: "Error ingesting endpoints and schemas", error });
+  }
+};
+
+export const updateEndpoint = async (req, res) => {
+  try {
+    const updatedEndpoint = await Endpoint.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true }
+    );
+    res.status(200).json(updatedEndpoint);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+};
+
+// Controller to delete an endpoint by ID
+export const deleteEndpoint = async (req, res) => {
+  try {
+    const deletedEndpoint = await Endpoint.findByIdAndDelete(req.params.id);
+
+    if (!deletedEndpoint) {
+      return res.status(404).json({ message: "Endpoint not found" });
+    }
+
+    // remove related threats
+    await Threat.deleteMany({ endpoint: req.params.id });
+
+    res.status(200).json({ message: "Endpoint deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+// Controller to delete multiple endpoints based on array of IDs or path
+export const deleteManyEndpoints = async (req, res) => {
+  try {
+    const { ids, path } = req.body;
+
+    let wherePayload = {};
+
+    if (ids && Array.isArray(ids)) {
+      wherePayload = { _id: { $in: ids } };
+    } else {
+      if (path) {
+        wherePayload = { path };
+      }
+      const idsToDelete = await Endpoint.find(wherePayload).select("_id");
+    }
+
+    const result = await Endpoint.deleteMany(wherePayload);
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: "Endpoints not found" });
+    }
+
+    // Remove related threats
+    if (ids && Array.isArray(ids)) {
+      await Threat.deleteMany({ endpoint: { $in: ids } });
+    } else {
+      await Threat.deleteMany({ endpoint: { $in: idsToDelete } });
+    }
+
+    res.status(200).json({
+      message: `${result.deletedCount} endpoints deleted successfully`,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
   }
 };
