@@ -39,7 +39,7 @@ export const apisForCoverage: { name: string; coverage: number }[] = [
 
 export type ApiType = "GET" | "POST" | "PUT" | "DELETE";
 export type ApiRisk = "High" | "Medium" | "Low";
-export interface Endpoint {
+export interface TempEndpoint {
   id: string;
   type: ApiType;
   path: string;
@@ -51,7 +51,7 @@ export interface Endpoint {
   created_at: Date;
 }
 
-export const endpoints: Endpoint[] = [
+export const endpoints: TempEndpoint[] = [
   {
     id: "1",
     type: "GET",

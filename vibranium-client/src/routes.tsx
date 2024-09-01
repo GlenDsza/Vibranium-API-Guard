@@ -2,7 +2,7 @@
 import Dashboard from "@/views/admin/Dashboard";
 import Reports from "@/views/admin/Reports";
 import Incidents from "@/views/admin/Incidents";
-import Staff from "@/views/admin/Staff";
+import Team from "@/views/admin/Team";
 import Chatbot from "@/views/admin/ChatBot";
 
 // Auth Imports
@@ -66,7 +66,7 @@ const routes = [
     layout: "/admin",
     path: "team",
     icon: <BsFillPeopleFill className="h-6 w-6" />,
-    component: <Staff />,
+    component: <Team />,
   },
   {
     name: "Sign In",

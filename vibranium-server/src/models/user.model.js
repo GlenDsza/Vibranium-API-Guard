@@ -28,6 +28,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    organization: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Organization",
+      default: "66d3f5019ce5c53aeb973d6e",
+    },
   },
   {
     timestamps: true,
