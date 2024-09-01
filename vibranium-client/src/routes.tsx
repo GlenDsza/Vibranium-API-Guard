@@ -18,6 +18,7 @@ import Endpoints from "./views/admin/Endpoints";
 import SignUp from "./views/auth/SignUp";
 import Traffic from "./views/admin/Traffic";
 import Collections from "./views/admin/Collections";
+import Threats from "./views/admin/Threats";
 
 const routes = [
   {
@@ -56,11 +57,11 @@ const routes = [
     component: <></>,
   },
   {
-    name: "Issues",
+    name: "Threats",
     layout: "/admin",
-    path: "issues",
+    path: "threats",
     icon: <MdReport className="h-6 w-6" />,
-    component: <></>,
+    component: <Threats />,
   },
   {
     name: "VibraniumGPT",

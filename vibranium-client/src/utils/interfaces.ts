@@ -22,7 +22,7 @@ export interface Schema {
 
 export interface Threat {
   _id: string;
-  endpoint: string;
+  endpoint: Endpoint;
   name: string;
   description: string;
   type: string;
