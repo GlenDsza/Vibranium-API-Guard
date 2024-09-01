@@ -9,9 +9,9 @@ import {
 
 const router = Router();
 
-router.get("/", auth, getThreats);
-router.post("/", auth, createThreat);
-router.put("/:id", auth, updateThreat);
+router.get("/", getThreats);
+router.post("/", createThreat);
+router.put("/:id", updateThreat);
 router.delete("/:id", auth, deleteThreat);
 
 export default router;

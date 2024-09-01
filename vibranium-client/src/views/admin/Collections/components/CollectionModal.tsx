@@ -35,6 +35,13 @@ const CollectionModal = ({
 
   const handleSubmit = () => {
     createCollection(formState);
+    setFormState({
+      name: "",
+      description: "",
+      endpoints: [],
+      tags: "",
+      organization: localStorage.getItem("organization") || "",
+    });
     onClose();
   };
 
