@@ -25,6 +25,7 @@ export interface Threat {
   endpoint: Endpoint;
   name: string;
   description: string;
+  organization: any;
   type: string;
   severity: "Low" | "Medium" | "High";
   recommendations?: string;
