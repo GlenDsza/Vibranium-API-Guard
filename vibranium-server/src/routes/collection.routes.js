@@ -10,7 +10,7 @@ import {
 const router = Router();
 
 router.get("/", getCollections);
-router.post("/", auth, createCollection);
+router.post("/", createCollection);
 router.put("/:id", auth, updateCollection);
 router.delete("/:id", auth, deleteCollection);
 
