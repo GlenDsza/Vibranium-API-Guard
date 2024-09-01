@@ -1,1 +1,3 @@
 requests
+openapi3
+faker
