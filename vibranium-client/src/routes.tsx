@@ -16,6 +16,7 @@ import { BsFillPeopleFill } from "react-icons/bs";
 import { FaCode } from "react-icons/fa6";
 import Endpoints from "./views/admin/Endpoints";
 import SignUp from "./views/auth/SignUp";
+import Testing from "./views/admin/Testing";
 import Traffic from "./views/admin/Traffic";
 import Collections from "./views/admin/Collections";
 import Threats from "./views/admin/Threats";
@@ -54,7 +55,7 @@ const routes = [
     layout: "/admin",
     path: "testing",
     icon: <FaRegCirclePlay className="h-6 w-6" />,
-    component: <></>,
+    component: <Testing />,
   },
   {
     name: "Threats",

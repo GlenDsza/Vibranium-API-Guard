@@ -158,3 +158,61 @@ export const ipaddresses: TempIP[] = [
   { ip: "191.243.217.151" },
   { ip: "63.226.53.197" },
 ];
+
+export interface TempVulnerability {
+  method: string;
+  endpoint: string;
+  risk: string;
+  passed: boolean;
+}
+
+export const vulnerabilities: TempVulnerability[] = [
+  {
+    method: "POST",
+    endpoint: "/products/{productId}",
+    risk: "SQL Injection",
+    passed: false,
+  },
+  {
+    method: "GET",
+    endpoint: "/products/{productId}",
+    risk: "Cross Site Scripting (XSS) ",
+    passed: false,
+  },
+  {
+    method: "POST",
+    endpoint: "/orders",
+    risk: "Mass Assignment",
+    passed: true,
+  },
+  {
+    method: "PUT",
+    endpoint: "/orders/{orderId}",
+    risk: "Broken User Authentication",
+    passed: true,
+  },
+  {
+    method: "GET",
+    endpoint: "/products",
+    risk: "Excessive Data Exposure",
+    passed: true,
+  },
+  {
+    method: "PUT",
+    endpoint: "/products/{productId}",
+    risk: "Broken Function Level Authorization",
+    passed: false,
+  },
+  {
+    method: "GET",
+    endpoint: "/orders/{orderId}",
+    risk: "Broken Object Level Authorization",
+    passed: true,
+  },
+  {
+    method: "GET",
+    endpoint: "/orders",
+    risk: "Excessive Data Exposure",
+    passed: true,
+  },
+];
