@@ -9,7 +9,6 @@ import {
   SortingState,
   useReactTable,
 } from "@tanstack/react-table";
-import { FaPlay } from "react-icons/fa";
 import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
 import Card from "@/components/card";
 import { FiSearch } from "react-icons/fi";
@@ -17,6 +16,7 @@ import Pagination from "@/components/pagination/Pagination";
 import ApiDetailDrawer from "./ApiDetailDrawer";
 import { Parameter } from "@/app/features/EndpointSlice";
 import { Schema, Threat } from "@/utils/interfaces";
+import { FaInfo } from "react-icons/fa";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -175,7 +175,7 @@ const EndpointTable = (props: { tableData: any }) => {
         </p>
       ),
     }),
-    columnHelper.accessor("actions", {
+    columnHelper.accessor("enabled", {
       id: "actions",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
@@ -185,11 +185,17 @@ const EndpointTable = (props: { tableData: any }) => {
       cell: (info) => (
         <div className="flex items-center space-x-2">
           <button
+            className={` flex items-center justify-center rounded-lg bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
+           hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
+          >
+            {info.getValue() ? "Disable" : "Enable"}
+          </button>
+          <button
             onClick={() => handleView(info.row.original)}
             className={` flex items-center justify-center rounded-lg bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
           >
-            <FaPlay className="h-4 w-4" />
+            <FaInfo className="h-4 w-4" />
           </button>
         </div>
       ),

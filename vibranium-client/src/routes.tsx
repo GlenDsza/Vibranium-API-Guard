@@ -17,6 +17,7 @@ import { FaCode } from "react-icons/fa6";
 import Endpoints from "./views/admin/Endpoints";
 import SignUp from "./views/auth/SignUp";
 import Traffic from "./views/admin/Traffic";
+import Collections from "./views/admin/Collections";
 
 const routes = [
   {
@@ -38,7 +39,7 @@ const routes = [
     layout: "/admin",
     path: "api-collection",
     icon: <BiCollection className="h-6 w-6" />,
-    component: <></>,
+    component: <Collections />,
   },
   {
     name: "API Endpoints",
