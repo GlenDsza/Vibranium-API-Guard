@@ -10,28 +10,101 @@
                 "summary": "Create Item",
                 "operationId": "create_item_items__post",
                 "requestBody": {
+                    "required": true,
                     "content": {
                         "application/json": {
                             "schema": {
                                 "$ref": "#/components/schemas/Item"
                             }
                         }
-                    },
-                    "required": true
+                    }
                 },
                 "responses": {
                     "200": {
                         "description": "Successful Response",
                         "content": {
                             "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Item"
-                                }
+                                "schema": {}
                             }
                         }
                     },
-                    "400": {
-                        "description": "Invalid item data"
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "delete": {
+                "summary": "Delete Item",
+                "operationId": "delete_item_items__delete",
+                "parameters": [
+                    {
+                        "name": "item_name",
+                        "in": "query",
+                        "required": true,
+                        "schema": {
+                            "type": "string",
+                            "title": "Item Name"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Validation Error",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/HTTPValidationError"
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            "get": {
+                "summary": "List Items",
+                "operationId": "list_items_items__get",
+                "parameters": [
+                    {
+                        "name": "min_price",
+                        "in": "query",
+                        "required": false,
+                        "schema": {
+                            "anyOf": [
+                                {
+                                    "type": "number",
+                                    "exclusiveMinimum": 0.0
+                                },
+                                {
+                                    "type": "null"
+                                }
+                            ],
+                            "title": "Min Price"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Successful Response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
                     },
                     "422": {
                         "description": "Validation Error",
@@ -66,14 +139,9 @@
                         "description": "Successful Response",
                         "content": {
                             "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Item"
-                                }
+                                "schema": {}
                             }
                         }
-                    },
-                    "404": {
-                        "description": "Item not found"
                     },
                     "422": {
                         "description": "Validation Error",
@@ -111,180 +179,6 @@
                         }
                     }
                 },
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/Item"
-                                }
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Item not found"
-                    },
-                    "400": {
-                        "description": "Invalid item data"
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            },
-            "delete": {
-                "summary": "Delete Item",
-                "operationId": "delete_item_items__item_name__delete",
-                "parameters": [
-                    {
-                        "name": "item_name",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "title": "Item Name"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    },
-                    "404": {
-                        "description": "Item not found"
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/items/search/{query}": {
-            "get": {
-                "summary": "Search Items",
-                "operationId": "search_items_items_search__query__get",
-                "parameters": [
-                    {
-                        "name": "query",
-                        "in": "path",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "title": "Query"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/items/vulnerable_search/": {
-            "get": {
-                "summary": "Vulnerable Search",
-                "operationId": "vulnerable_search_items_vulnerable_search__get",
-                "parameters": [
-                    {
-                        "name": "query",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "title": "Query"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Successful Response",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Validation Error",
-                        "content": {
-                            "application/json": {
-                                "schema": {
-                                    "$ref": "#/components/schemas/HTTPValidationError"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "items/add-item": {
-            "post": {
-                "summary": "Add Item",
-                "operationId": "add_itemitems_add_item_post",
-                "parameters": [
-                    {
-                        "name": "id",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "title": "Id"
-                        }
-                    },
-                    {
-                        "name": "name",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "type": "string",
-                            "title": "Name"
-                        }
-                    },
-                    {
-                        "name": "description",
-                        "in": "query",
-                        "required": true,
-                        "schema": {
-                            "title": "Description"
-                        }
-                    }
-                ],
                 "responses": {
                     "200": {
                         "description": "Successful Response",

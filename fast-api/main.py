@@ -1,71 +1,108 @@
-from fastapi import FastAPI, HTTPException, Query, Body
+from fastapi import FastAPI, HTTPException, Query
 from pydantic import BaseModel
 from typing import Optional
+import sqlite3
 
 app = FastAPI()
 
-# Define the data model for the request body
+# Define the Pydantic model
 class Item(BaseModel):
     name: str
     description: Optional[str] = None
     price: float
     tax: Optional[float] = None
 
-# Mock database (in-memory)
-fake_db = {}
+# Utility function to get a database connection
+def get_db_connection():
+    conn = sqlite3.connect('database.db')
+    conn.row_factory = sqlite3.Row
+    return conn
+
+# Create the items table
+def init_db():
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            CREATE TABLE IF NOT EXISTS items (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                name TEXT NOT NULL,
+                description TEXT,
+                price REAL NOT NULL,
+                tax REAL
+            )
+        ''')
+        conn.commit()
+
+# Initialize the database
+init_db()
 
 # Create
-@app.post("/items/", response_model=Item, responses={400: {"description": "Invalid item data"}})
-async def create_item(item: Item):
+@app.post("/items/")
+def create_item(item: Item):
     if item.price < 0:
         raise HTTPException(status_code=400, detail="Price must be a positive value")
-    fake_db[item.name] = item
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO items (name, description, price, tax)
+            VALUES (?, ?, ?, ?)
+        ''', (item.name, item.description, item.price, item.tax))
+        conn.commit()
     return item
 
 # Read
-@app.get("/items/{item_name}", response_model=Item, responses={404: {"description": "Item not found"}})
-async def read_item(item_name: str):
-    item = fake_db.get(item_name)
-    if item is None:
-        raise HTTPException(status_code=404, detail="Item not found")
-    return item
+@app.get("/items/{item_name}")
+def read_item(item_name: str):
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            SELECT * FROM items WHERE name = ?
+        ''', (item_name,))
+        item = cursor.fetchone()
+        if item is None:
+            raise HTTPException(status_code=404, detail="Item not found")
+        return dict(item)
 
 # Update
-@app.put("/items/{item_name}", response_model=Item, responses={404: {"description": "Item not found"}, 400: {"description": "Invalid item data"}})
-async def update_item(item_name: str, item: Item):
-    if item_name not in fake_db:
-        raise HTTPException(status_code=404, detail="Item not found")
-    if item.price < 0:
-        raise HTTPException(status_code=400, detail="Price must be a positive value")
-    fake_db[item_name] = item
+@app.put("/items/{item_name}")
+def update_item(item_name: str, item: Item):
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            UPDATE items SET name = ?, description = ?, price = ?, tax = ?
+            WHERE name = ?
+        ''', (item.name, item.description, item.price, item.tax, item_name))
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Item not found")
+        conn.commit()
     return item
 
 # Delete
-@app.delete("/items/{item_name}", responses={404: {"description": "Item not found"}})
-async def delete_item(item_name: str):
-    if item_name not in fake_db:
-        raise HTTPException(status_code=404, detail="Item not found")
-    del fake_db[item_name]
+@app.delete("/items/")
+def delete_item(item_name: str):
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        cursor.execute('''
+            DELETE FROM items WHERE name = ?
+        ''', (item_name,))
+        print(item_name)
+        if cursor.rowcount == 0:
+            raise HTTPException(status_code=404, detail="Item not found")
+        conn.commit()
     return {"detail": "Item deleted"}
 
-# # Query parameters example
-# @app.get("/items/")
-# async def list_items(min_price: Optional[float] = Query(None, gt=0)):
-#     filtered_items = [item for item in fake_db.values() if min_price is None or item.price >= min_price]
-#     return filtered_items
-
-# XSS Vulnerability Example
-@app.get("/items/search/{query}")
-async def search_items(query: str):
-    # Unsafe rendering of user input, potential XSS vulnerability
-    return {"result": f"<p>Search results for: {query}</p>"}
-
-
-@app.get("/items/vulnerable_search/")
-async def vulnerable_search(query: str):
-    # Unsafe rendering of user input, potential XSS vulnerability
-    return {"result": f"<div>Hello, {query}!</div>"}
-
-@app.post("items/add-item")
-async def add_item(id: str, name: str, description):
-    return {"id": id, "name": name, "description": description}
+# Query parameters example
+@app.get("/items/")
+def list_items(min_price: Optional[float] = Query(None, gt=0)):
+    with get_db_connection() as conn:
+        cursor = conn.cursor()
+        if min_price is None:
+            cursor.execute('''
+                SELECT * FROM items
+            ''')
+        else:
+            cursor.execute('''
+                SELECT * FROM items WHERE price >= ?
+            ''', (min_price,))
+        items = cursor.fetchall()
+    return [dict(item) for item in items]

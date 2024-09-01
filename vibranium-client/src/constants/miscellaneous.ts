@@ -141,3 +141,20 @@ export const endpoints: TempEndpoint[] = [
     created_at: new Date(),
   },
 ];
+
+export interface TempIP {
+  ip: string;
+}
+
+export const ipaddresses: TempIP[] = [
+  { ip: "166.146.62.254" },
+  { ip: "42.214.247.167" },
+  { ip: "152.33.246.174" },
+  { ip: "139.20.115.179" },
+  { ip: "88.202.198.188" },
+  { ip: "87.154.125.16" },
+  { ip: "99.106.74.255" },
+  { ip: "58.138.104.239" },
+  { ip: "191.243.217.151" },
+  { ip: "63.226.53.197" },
+];

@@ -1,9 +1,31 @@
 import logging
 from flask import Flask, request, Response
+from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 import requests
 from collections import defaultdict, deque
 import time
 import re
+from lib.URLMatcher import URLMatcher
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+MONGODB_URI = os.getenv("MONGODB_URI")
+SERVER_URL = os.getenv("SERVER_URL")
+
+client = MongoClient(MONGODB_URI, server_api=ServerApi("1"))
+
+try:
+    client.admin.command("ping")
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+
+db = client["test"]
+endpoints = db["endpoints"]
 
 app = Flask(__name__)
 
@@ -28,7 +50,7 @@ not_found_timestamps = defaultdict(deque)
 blocked_ips = set()
 
 # Allowed IPs (for demonstration purposes, only allow local IPs)
-ALLOWED_IPS = ["127.0.0.1", "::1"]
+MANUAL_BLOCKED_IPS = set()
 
 # XSS Filtering Pattern
 XSS_PATTERN = re.compile(r"<.*?>")
@@ -87,7 +109,7 @@ def not_found_limited(ip):
 
 def is_valid_ip(ip):
     """Check if the IP address is allowed."""
-    valid = ip in ALLOWED_IPS
+    valid = ip not in MANUAL_BLOCKED_IPS
     if not valid:
         logging.warning(f"Blocked request from invalid IP: {ip}")
     return valid
@@ -141,9 +163,18 @@ def proxy(url):
     if rate_limited(client_ip):
         return Response("Rate limit exceeded. Try again later.", status=429)
 
-    target_url = (
-        f"http://localhost:5173/{url}"  # Forward to Node.js server running on port 5173
-    )
+    target_url = f"{SERVER_URL}/{url}"  # Forward to Node.js server running on port 5173
+
+    disabled_endpoints = endpoints.find({"enabled": False})
+    disabled_endpoints_urls = []
+
+    for endpoint in disabled_endpoints:
+        if "path" in endpoint:
+            disabled_endpoints_urls.append(endpoint["path"])
+
+    matcher = URLMatcher(disabled_endpoints_urls)
+    if matcher.checkMatch(url):
+        return Response("This endpoint is disabled.", status=403)
 
     try:
         if request.method == "GET":
@@ -161,7 +192,7 @@ def proxy(url):
             )
     except requests.RequestException as e:
         logging.error(f"Error during request to {target_url}: {e}")
-        return Response(f"An error occurred: {e}", status=500)
+        return Response(f"An error occurred", status=500)
 
     if resp.status_code == 404:
         if not_found_limited(client_ip):

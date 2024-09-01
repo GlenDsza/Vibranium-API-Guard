@@ -1,1 +1,3 @@
 proxy_server.log
+.env
+__pycache__
