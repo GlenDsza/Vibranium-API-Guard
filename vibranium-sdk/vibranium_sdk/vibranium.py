@@ -60,69 +60,9 @@ class VibraniumSDK:
         except requests.RequestException as e:
             return f"Error testing XSS at {url}: {e}"
     
-    def test_open_redirect(self, url):
-        """Test for Open Redirect vulnerabilities."""
-        payload = "http://malicious-site.com"
-        try:
-            response = requests.get(url, params={"redirect": payload})
-            if response.url.startswith(payload):
-                return f"Open Redirect vulnerability found at {url}."
-            return f"No Open Redirect vulnerability at {url}."
-        except requests.RequestException as e:
-            return f"Error testing Open Redirect at {url}: {e}"
-
-    def test_sensitive_data_exposure(self, url):
-        """Test for sensitive data exposure."""
-        try:
-            response = requests.get(url)
-            if "Authorization" in response.headers or "X-API-KEY" in response.headers:
-                return f"Sensitive data exposure found at {url}."
-            return f"No Sensitive Data Exposure at {url}."
-        except requests.RequestException as e:
-            return f"Error testing Sensitive Data Exposure at {url}: {e}"
-
-    def test_security_misconfiguration(self, url):
-        """Test for security misconfigurations."""
-        headers = {
-            "X-Content-Type-Options": "nosniff",
-            "X-Frame-Options": "DENY",
-            "X-XSS-Protection": "1; mode=block",
-            "Strict-Transport-Security": "max-age=31536000; includeSubDomains"
-        }
-        try:
-            response = requests.get(url)
-            missing_headers = [header for header in headers if headers[header] not in response.headers.get(header, "")]
-            if missing_headers:
-                return f"Security Misconfiguration found at {url}. Missing headers: {', '.join(missing_headers)}"
-            return f"No Security Misconfiguration at {url}."
-        except requests.RequestException as e:
-            return f"Error testing Security Misconfiguration at {url}: {e}"
-
-    def test_insecure_deserialization(self, url):
-        """Test for Insecure Deserialization vulnerabilities."""
-        payload = '{"user": "admin", "role": "admin"}'  # Example payload
-        try:
-            response = requests.post(url, data=payload, headers={"Content-Type": "application/json"})
-            if response.status_code == 200:
-                return f"Insecure Deserialization vulnerability found at {url}."
-            return f"No Insecure Deserialization vulnerability at {url}."
-        except requests.RequestException as e:
-            return f"Error testing Insecure Deserialization at {url}: {e}"
-
-    def test_broken_access_control(self, url):
-        """Test for Broken Access Control vulnerabilities."""
-        try:
-            response = requests.get(url)
-            if response.status_code == 403:
-                return f"Broken Access Control vulnerability found at {url}."
-            return f"No Broken Access Control vulnerability at {url}."
-        except requests.RequestException as e:
-            return f"Error testing Broken Access Control at {url}: {e}"
-
     def perform_tests(self, spec):
         """Performs basic tests on the OpenAPI specification."""
         results = {
-            "missing_descriptions": [],
             "sql_injection_results": [],
             "xss_results": [],
             "open_redirect_results": [],
@@ -138,12 +78,6 @@ class VibraniumSDK:
 
         print("Running tests on the OpenAPI specification...")
 
-        # Test 1: Check if all endpoints have descriptions
-        for path, methods in spec.get('paths', {}).items():
-            for method, details in methods.items():
-                if 'description' not in details:
-                    results["missing_descriptions"].append(f"{method.upper()} {path}")
-
         # Test SQL Injection, XSS, and other vulnerabilities on all endpoints
         for path, methods in spec.get('paths', {}).items():
             for method, details in methods.items():
@@ -153,17 +87,6 @@ class VibraniumSDK:
                     results["sql_injection_results"].append(self.test_sql_injection(url))
                 print(f"Testing XSS on {url}...")
                 results["xss_results"].append(self.test_xss(url))
-                print(f"Testing Open Redirect on {url}...")
-                results["open_redirect_results"].append(self.test_open_redirect(url))
-                print(f"Testing Sensitive Data Exposure on {url}...")
-                results["sensitive_data_exposure_results"].append(self.test_sensitive_data_exposure(url))
-                print(f"Testing Security Misconfiguration on {url}...")
-                results["security_misconfiguration_results"].append(self.test_security_misconfiguration(url))
-                print(f"Testing Insecure Deserialization on {url}...")
-                results["insecure_deserialization_results"].append(self.test_insecure_deserialization(url))
-                print(f"Testing Broken Access Control on {url}...")
-                results["broken_access_control_results"].append(self.test_broken_access_control(url))
-
         return results
 
     def generate_report(self, results):
