@@ -36,6 +36,7 @@ export const createCollection = async (req, res) => {
     const newCollection = await collection.save();
     res.status(201).json(newCollection);
   } catch (error) {
+    console.log(error);
     res.status(400).json({ message: error.message });
   }
 };
