@@ -70,7 +70,7 @@ type RowObj = {
   actions: string | undefined;
 };
 
-const EndpointTable = (props: { tableData: any }) => {
+const EndpointTable = (props: { tableData: any, onOpen: any }) => {
   const columnHelper = createColumnHelper<RowObj>();
   const { tableData } = props;
 
@@ -331,6 +331,7 @@ const EndpointTable = (props: { tableData: any }) => {
           endpoint={selectedRow}
           open={showDrawer}
           hide={() => setShowDrawer(false)}
+          onOpen={props.onOpen}
         />
       )}
     </>
