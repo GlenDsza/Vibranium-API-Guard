@@ -1,5 +1,9 @@
 import argparse
 from vibranium_sdk.vibranium import VibraniumSDK
+import pyfiglet
+
+ascii_banner = pyfiglet.figlet_format("Vibranium")
+print(ascii_banner)
 
 def main():
     parser = argparse.ArgumentParser(description="Run OpenAPI tests on a FastAPI app.")

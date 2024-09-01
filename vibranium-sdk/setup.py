@@ -2,13 +2,17 @@ from setuptools import setup, find_packages
 
 setup(
     name='vibranium-sdk',
-    version='0.1.0',
+    version='0.1.1',
     description='SDK for fetching and testing OpenAPI specs from FastAPI applications',
     author='Om Avhad',
     author_email='omavhad22@gmail.com',
+    long_description=open('README.md').read(),  # Long description read from README.md
+    long_description_content_type='text/markdown',  # Format of the long description
     packages=find_packages(),
     install_requires=[
         'requests',
+        'openapi3',
+        'faker'
     ],
     entry_points={
         'console_scripts': [
