@@ -1,13 +1,14 @@
-import { TempEndpoint } from "@/constants/miscellaneous";
 import { Drawer } from "@material-tailwind/react";
-import { useState, type FC } from "react";
+import { useEffect, useState, type FC } from "react";
 import { BiCollection } from "react-icons/bi";
-import { FaPlay, FaLock, FaRegClock } from "react-icons/fa";
+import { FaPlay, FaRegClock } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { BsExclamationCircle } from "react-icons/bs";
 import { IoCopyOutline } from "react-icons/io5";
 import { LuGlobe } from "react-icons/lu";
 import { IoIosInformationCircleOutline } from "react-icons/io";
+import { MdOutlineUpdate } from "react-icons/md";
+import { TbFileDescription } from "react-icons/tb";
 import { getDateTime } from "@/constants/utils";
 import { Tabs, TabList, TabPanels, Tab, TabPanel } from "@chakra-ui/react";
 import {
@@ -15,11 +16,12 @@ import {
   AccordionHeader,
   AccordionBody,
 } from "@material-tailwind/react";
+import { Endpoint } from "@/app/features/EndpointSlice";
 
 interface ApiDetailDrawerProps {
   open: boolean;
   hide: () => void;
-  endpoint: TempEndpoint;
+  endpoint: Endpoint;
 }
 
 const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
@@ -27,20 +29,38 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
   hide,
   endpoint,
 }) => {
+  const {
+    _id,
+    method,
+    path,
+    parameters,
+    enabled,
+    operationId,
+    summary,
+    organization,
+    requestBody,
+    responses,
+    threats,
+    createdAt,
+    updatedAt,
+  } = endpoint;
+  const [risk, setRisk] = useState<string>("Low");
   const [accOpen, setAccOpen] = useState<number>(0);
   const handleOpen = (value: number) =>
     setAccOpen(accOpen === value ? 0 : value);
 
-  const {
-    collection,
-    hostName,
-    accessType,
-    authType,
-    created_at,
-    risk,
-    path,
-    type,
-  } = endpoint;
+  useEffect(() => {
+    let temp = threats.reduce((acc, threat) => {
+      if (threat.severity === "High") {
+        return "High";
+      } else if (threat.severity === "Medium") {
+        return acc === "High" ? "High" : "Medium";
+      } else {
+        return acc === "High" || acc === "Medium" ? acc : "Low";
+      }
+    }, "None Detected");
+    setRisk(temp);
+  }, [endpoint]);
 
   function NewIcon({ id, open }: { id: number; open: number }) {
     return (
@@ -92,7 +112,9 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
               className="items-center justify-start rounded-md bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10 ps-2"
             >
-              <p className="font-bold text-navy-700 dark:text-white">{type}</p>
+              <p className="font-bold text-navy-700 dark:text-white">
+                {method.toUpperCase()}
+              </p>
             </div>
             <p className="font-bold text-navy-700 dark:text-white">{path}</p>
             <IoCopyOutline className="h-4 w-4 text-gray-400 dark:text-white cursor-pointer" />
@@ -116,17 +138,17 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
                 Collection
               </p>
             </div>
-            <p className="text-sm font-bold ms-3">{collection}</p>
+            <p className="text-sm font-bold ms-3">{"collection"}</p>
           </div>
 
           <div className="flex flex-col gap-3">
             <div className="flex gap-3">
-              <LuGlobe className="h-5 w-5 text-gray-600 dark:text-white" />
+              <TbFileDescription className="h-5 w-5 text-gray-600 dark:text-white" />
               <p className="text-sm font-bold text-gray-600 dark:text-white">
-                Host Name
+                Summary
               </p>
             </div>
-            <p className="text-sm font-bold ms-3">{hostName}</p>
+            <p className="text-sm font-bold ms-3">{summary}</p>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -137,30 +159,7 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
                 Access Type
               </p>
             </div>
-            <p className="text-sm font-bold ms-3">{accessType}</p>
-          </div>
-
-          <div className="flex flex-col gap-3">
-            <div className="flex gap-3">
-              <FaLock className="h-4 w-4 text-gray-600 dark:text-white" />
-              <p className="text-sm font-bold text-gray-600 dark:text-white">
-                Auth Type
-              </p>
-            </div>
-            <p className="text-sm font-bold ms-3">{authType}</p>
-          </div>
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <div className="flex flex-col gap-3">
-            <div className="flex gap-3">
-              <FaRegClock className="h-5 w-5 text-gray-600 dark:text-white" />
-              <p className="text-sm font-bold text-gray-600 dark:text-white">
-                Discovered
-              </p>
-            </div>
-            <p className="text-sm font-bold ms-3">
-              {getDateTime(created_at.toString())}
-            </p>
+            <p className="text-sm font-bold ms-3">Public</p>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -171,6 +170,27 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
               </p>
             </div>
             <p className="text-sm font-bold ms-3">{risk}</p>
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="flex flex-col gap-3">
+            <div className="flex gap-3">
+              <FaRegClock className="h-5 w-5 text-gray-600 dark:text-white" />
+              <p className="text-sm font-bold text-gray-600 dark:text-white">
+                Discovered
+              </p>
+            </div>
+            <p className="text-sm font-bold ms-3">{getDateTime(createdAt)}</p>
+          </div>
+
+          <div className="flex flex-col gap-3">
+            <div className="flex gap-3">
+              <MdOutlineUpdate className="h-5 w-5 text-gray-600 dark:text-white" />
+              <p className="text-sm font-bold text-gray-600 dark:text-white">
+                Last Updated
+              </p>
+            </div>
+            <p className="text-sm font-bold ms-3">{getDateTime(updatedAt)}</p>
           </div>
         </div>
 

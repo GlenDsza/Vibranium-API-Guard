@@ -7,6 +7,7 @@ import routes from "@/routes";
 import { fetchAdmin } from "@/app/features/AdminSlice";
 import { useAppDispatch, useAppSelector } from "@/app/store";
 import { fetchTeam } from "@/app/features/TeamSlice";
+import { fetchEndpoints } from "@/app/features/EndpointSlice";
 
 export default function Admin(props: Record<string, unknown>) {
   const { ...rest } = props;
@@ -38,11 +39,11 @@ export default function Admin(props: Record<string, unknown>) {
         fetchAdmin(localStorage.getItem("id") as string);
         return;
       }
-      // dispatch(
-      //   fetchIncidents({
-      //     stationName: admin.name,
-      //   })
-      // );
+      dispatch(
+        fetchEndpoints({
+          organization: localStorage.getItem("organization") as string,
+        })
+      );
       dispatch(
         fetchTeam({
           organization: localStorage.getItem("organization") as string,

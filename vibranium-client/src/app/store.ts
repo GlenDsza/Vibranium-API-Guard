@@ -2,14 +2,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import { TypedUseSelectorHook, useDispatch, useSelector } from "react-redux";
 import { AdminSlice } from "./features/AdminSlice";
 import { TeamSlice } from "./features/TeamSlice";
-import { IncidentSlice } from "./features/IncidentSlice";
+import { EndpointSlice } from "./features/EndpointSlice";
 import { NotificationSlice } from "./features/NotificationSlice";
 
 export const store = configureStore({
   reducer: {
     admin: AdminSlice.reducer,
     team: TeamSlice.reducer,
-    incidents: IncidentSlice.reducer,
+    endpoints: EndpointSlice.reducer,
     notifications: NotificationSlice.reducer,
   },
 });

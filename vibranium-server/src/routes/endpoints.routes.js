@@ -10,7 +10,8 @@ import {
 
 const router = Router();
 
-router.get("/", auth, getEndpoints);
+router.get("/", getEndpoints);
+// router.get("/getCollections", getCollections);
 router.put("/:id", auth, updateEndpoint);
 router.post("/ingest", ingestEndpoints);
 router.delete("/:id", auth, deleteEndpoint);

@@ -2,7 +2,7 @@ import Endpoint from "../models/endpoint.model.js";
 import Schema from "../models/schema.model.js";
 
 export const getEndpoints = async (req, res) => {
-  const { id, path } = req.query;
+  const { id, path, organization } = req.query;
 
   let wherePayload = {};
 
@@ -12,9 +12,37 @@ export const getEndpoints = async (req, res) => {
   if (path) {
     wherePayload = { ...wherePayload, path };
   }
+  if (organization) {
+    wherePayload = { ...wherePayload, organization };
+  }
 
   try {
-    const endpoints = await Endpoint.find(wherePayload);
+    let endpoints = await Endpoint.find(wherePayload)
+      .populate("threats")
+      .populate("organization")
+      .populate("requestBody.content.application/json.schemaRef");
+
+    // Iterate through each endpoint and populate response schemaRefs manually
+    endpoints = await Promise.all(
+      endpoints.map(async (endpoint) => {
+        if (endpoint.responses) {
+          for (const [key, response] of endpoint.responses.entries()) {
+            if (
+              response.content &&
+              response.content["application/json"] &&
+              response.content["application/json"].schemaRef
+            ) {
+              const populatedSchema = await Schema.findById(
+                response.content["application/json"].schemaRef
+              );
+              response.content["application/json"].schemaRef = populatedSchema;
+            }
+          }
+        }
+        return endpoint;
+      })
+    );
+
     return res.json(endpoints);
   } catch (error) {
     console.error(error);
