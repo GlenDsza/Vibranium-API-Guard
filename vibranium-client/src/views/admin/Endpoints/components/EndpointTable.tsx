@@ -17,6 +17,7 @@ import ApiDetailDrawer from "./ApiDetailDrawer";
 import { Parameter } from "@/app/features/EndpointSlice";
 import { Schema, Threat } from "@/utils/interfaces";
 import { FaInfo } from "react-icons/fa";
+import { enableEndpointApi } from "@/apis/endpoints";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -80,6 +81,24 @@ const EndpointTable = (props: { tableData: any }) => {
   const handleView = (rowObj: RowObj) => {
     setSelectedRow(rowObj);
     setShowDrawer(true);
+  };
+
+  const enableEndpoint = (id: string, row: RowObj, enable: boolean = true) => {
+    const modified_row = {
+      ...row,
+      enabled: enable,
+    };
+    enableEndpointApi(id, modified_row).then((res) => {
+      if (res.success) {
+        const updatedData = tableData.map((item: RowObj) => {
+          if (item._id === id) {
+            return modified_row;
+          }
+          return item;
+        });
+        _(updatedData);
+      }
+    });
   };
 
   const columns = [
@@ -187,6 +206,13 @@ const EndpointTable = (props: { tableData: any }) => {
           <button
             className={` flex items-center justify-center rounded-lg bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
+            onClick={() =>
+              enableEndpoint(
+                info.row.original._id,
+                info.row.original,
+                !info.getValue()
+              )
+            }
           >
             {info.getValue() ? "Disable" : "Enable"}
           </button>
