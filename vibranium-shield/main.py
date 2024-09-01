@@ -164,7 +164,7 @@ def proxy(url):
         return Response("Rate limit exceeded. Try again later.", status=429)
 
     target_url = (
-        f"http://localhost:5173/{url}"  # Forward to Node.js server running on port 5173
+        f"{SERVER_URL}/{url}"  # Forward to Node.js server running on port 5173
     )
 
     disabled_endpoints = endpoints.find({"enabled": False})
