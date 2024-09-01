@@ -1,9 +1,31 @@
 import logging
 from flask import Flask, request, Response
+from pymongo import MongoClient
+from pymongo.server_api import ServerApi
 import requests
 from collections import defaultdict, deque
 import time
 import re
+from lib.URLMatcher import URLMatcher
+
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+MONGODB_URI = os.getenv("MONGODB_URI")
+SERVER_URL = os.getenv("SERVER_URL")
+
+client = MongoClient(MONGODB_URI, server_api=ServerApi("1"))
+
+try:
+    client.admin.command("ping")
+    print("Pinged your deployment. You successfully connected to MongoDB!")
+except Exception as e:
+    print(e)
+
+db = client["test"]
+endpoints = db["endpoints"]
 
 app = Flask(__name__)
 
@@ -145,6 +167,17 @@ def proxy(url):
         f"http://localhost:5173/{url}"  # Forward to Node.js server running on port 5173
     )
 
+    disabled_endpoints = endpoints.find({"enabled": False})
+    disabled_endpoints_urls = []
+
+    for endpoint in disabled_endpoints:
+        if "path" in endpoint:
+            disabled_endpoints_urls.append(endpoint["path"])
+
+    matcher = URLMatcher(disabled_endpoints_urls)
+    if matcher.checkMatch(url):
+        return Response("This endpoint is disabled.", status=403)
+
     try:
         if request.method == "GET":
             logging.info(f"GET request to {target_url} from IP: {client_ip}")
@@ -161,7 +194,7 @@ def proxy(url):
             )
     except requests.RequestException as e:
         logging.error(f"Error during request to {target_url}: {e}")
-        return Response(f"An error occurred: {e}", status=500)
+        return Response(f"An error occurred", status=500)
 
     if resp.status_code == 404:
         if not_found_limited(client_ip):
