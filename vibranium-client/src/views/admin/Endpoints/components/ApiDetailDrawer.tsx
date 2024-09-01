@@ -31,6 +31,7 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
   open,
   hide,
   endpoint,
+  onOpen
 }) => {
   const {
     _id,
@@ -73,9 +74,9 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
   }, [responses]);
 
 
-  const closeModal = () => {
+  const closeDrawer = () => {
     hide();
-    
+    onOpen();
   }
 
   const computeRisk = () => {
@@ -166,7 +167,7 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
           </div>
           <div className="col-span-1">
             <button
-              onClick={() => {closeModal()}}
+              onClick={() => {closeDrawer()}}
               className={` flex items-center justify-center rounded-lg bg-brand-50 p-3  font-medium text-brand-500 transition duration-200
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
             >
