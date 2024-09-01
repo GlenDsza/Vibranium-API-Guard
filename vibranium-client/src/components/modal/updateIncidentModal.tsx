@@ -9,8 +9,7 @@ import Card from "@/components/card";
 import { MdCheckCircle } from "react-icons/md";
 import { IoMdClose } from "react-icons/io";
 import { BsClockHistory } from "react-icons/bs";
-import { useAppDispatch } from "@/app/store";
-import { updateIncident } from "@/app/features/IncidentSlice";
+// import { updateIncident } from "@/app/features/IncidentSlice";
 
 type Incident = {
   id: string;
@@ -39,12 +38,10 @@ const UpdateIncidentModal = ({
   incident,
   updateData,
 }: updateIncidentModalProps) => {
-  const dispatch = useAppDispatch();
-
   const handleBtnClick = (status: string) => {
     updateData(incident?.id, status);
     setTimeout(() => {
-      dispatch(updateIncident({ id: incident?.id, status: status }));
+      // dispatch(updateIncident({ id: incident?.id, status: status }));
     }, 10000);
     onUpdateIncidentModalClose();
   };

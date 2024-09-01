@@ -14,8 +14,6 @@ import { MdOutlineLocationOn } from "react-icons/md";
 import { IoImages } from "react-icons/io5";
 import { FaTrash } from "react-icons/fa";
 import { LiaUserShieldSolid } from "react-icons/lia";
-import { useAppDispatch } from "@/app/store";
-import { deleteIncident } from "@/app/features/IncidentSlice";
 import { IoMdClose } from "react-icons/io";
 import { SOURCES, getSource } from "../../constants/validations";
 
@@ -46,12 +44,10 @@ const IncidentModal = ({
   showSource,
   incident,
 }: IncidentModalProps) => {
-  
-  const dispatch = useAppDispatch();
   const hasImage = incident?.image !== "";
 
-  const handleDelete = (incident: Incident) => {
-    dispatch(deleteIncident({ id: incident.id }));
+  const handleDelete = (_incident: Incident) => {
+    // dispatch(deleteIncident({ id: incident.id }));
     onIncidentModalClose();
   };
 
@@ -212,7 +208,9 @@ const IncidentModal = ({
                       )}
 
                       <p>
-                        {getSource(incident?.source) === SOURCES.USER ? "User Report" : incident?.source}
+                        {getSource(incident?.source) === SOURCES.USER
+                          ? "User Report"
+                          : incident?.source}
                       </p>
                     </div>
                   </div>

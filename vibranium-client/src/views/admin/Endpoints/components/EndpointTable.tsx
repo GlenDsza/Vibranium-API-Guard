@@ -14,8 +14,9 @@ import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
 import Card from "@/components/card";
 import { FiSearch } from "react-icons/fi";
 import Pagination from "@/components/pagination/Pagination";
-import { ApiRisk, ApiType } from "@/constants/miscellaneous";
 import ApiDetailDrawer from "./ApiDetailDrawer";
+import { Parameter } from "@/app/features/EndpointSlice";
+import { Schema, Threat } from "@/utils/interfaces";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -35,15 +36,36 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 };
 
 type RowObj = {
-  id: string;
-  type: ApiType;
+  _id: string;
   path: string;
-  risk: ApiRisk;
-  hostName: string;
-  collection: string;
-  accessType: string;
-  authType: string;
-  created_at: Date;
+  method: "get" | "post" | "put" | "patch" | "delete";
+  summary: string;
+  operationId: string;
+  enabled: boolean;
+  organization: string;
+  parameters: Parameter[];
+  requestBody: {
+    content: {
+      "application/json": {
+        schemaRef: Schema;
+      };
+    };
+    required: boolean;
+  };
+  responses: Map<
+    string,
+    {
+      description: string;
+      content: {
+        "application/json": {
+          schemaRef: Schema;
+        };
+      };
+    }
+  >;
+  threats: Threat[];
+  createdAt: string;
+  updatedAt: string;
   actions: string | undefined;
 };
 
@@ -61,20 +83,20 @@ const EndpointTable = (props: { tableData: any }) => {
   };
 
   const columns = [
-    columnHelper.accessor("type", {
-      id: "type",
+    columnHelper.accessor("method", {
+      id: "method",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
-          TYPE
+          METHOD
         </p>
       ),
-      cell: (info: any) => (
+      cell: (info) => (
         <div
           className="flex items-center justify-start rounded-md bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10 w-[75%] ps-2"
         >
           <p className="text-sm font-bold text-navy-700 dark:text-white">
-            {info.getValue()}
+            {info.getValue().toUpperCase()}
           </p>
         </div>
       ),
@@ -86,54 +108,68 @@ const EndpointTable = (props: { tableData: any }) => {
           ENDPOINT
         </p>
       ),
-      cell: (info: any) => (
+      cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
           {info.getValue()}
         </p>
       ),
     }),
-    columnHelper.accessor("risk", {
+    columnHelper.accessor("threats", {
       id: "risk",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
           RISK
         </p>
       ),
-      cell: (info: any) => (
-        <p
-          className={`text-sm font-bold ${
-            info.getValue() === "Low"
-              ? "text-green-500 dark:text-green-300"
-              : info.getValue() === "Medium"
-              ? "text-amber-500 dark:text-amber-300"
-              : "text-red-500 dark:text-red-300"
-          }`}
-        >
-          {info.getValue()}
-        </p>
-      ),
+      cell: (info) => {
+        const threats = info.getValue() as Threat[];
+        const risk = threats.reduce((acc, threat) => {
+          if (threat.severity === "High") {
+            return "High";
+          } else if (threat.severity === "Medium") {
+            return acc === "High" ? "High" : "Medium";
+          } else {
+            return acc === "High" || acc === "Medium" ? acc : "Low";
+          }
+        }, "None Detected");
+        return (
+          <p
+            className={`text-sm font-bold ${
+              risk === "Low"
+                ? "text-green-500 dark:text-green-300"
+                : risk === "Medium"
+                ? "text-amber-500 dark:text-amber-300"
+                : risk === "High"
+                ? "text-red-500 dark:text-red-300"
+                : "text-gray-500 dark:text-gray-300"
+            }`}
+          >
+            {risk}
+          </p>
+        );
+      },
     }),
-    columnHelper.accessor("hostName", {
-      id: "hostName",
+    columnHelper.accessor("enabled", {
+      id: "status",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
-          HOST NAME
+          STATUS
         </p>
       ),
-      cell: (info: any) => (
+      cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
-          {info.getValue()}
+          {info.getValue() ? "Active" : "Disabled"}
         </p>
       ),
     }),
-    columnHelper.accessor("collection", {
-      id: "collection",
+    columnHelper.accessor("summary", {
+      id: "summary",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
-          COLLECTION
+          SUMMARY
         </p>
       ),
-      cell: (info: any) => (
+      cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
           {info.getValue()}
         </p>
@@ -146,7 +182,7 @@ const EndpointTable = (props: { tableData: any }) => {
           ACTIONS
         </p>
       ),
-      cell: (info: any) => (
+      cell: (info) => (
         <div className="flex items-center space-x-2">
           <button
             onClick={() => handleView(info.row.original)}

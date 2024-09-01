@@ -38,7 +38,7 @@ export const apisForCoverage: { name: string; coverage: number }[] = [
 ];
 
 export type ApiType = "GET" | "POST" | "PUT" | "DELETE";
-export type ApiRisk = "High" | "Medium" | "Low";
+export type ApiRisk = "High" | "Medium" | "Low" | "None Detected";
 export interface TempEndpoint {
   id: string;
   type: ApiType;

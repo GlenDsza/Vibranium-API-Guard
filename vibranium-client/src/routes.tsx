@@ -1,7 +1,5 @@
 // Admin Imports
 import Dashboard from "@/views/admin/Dashboard";
-import Reports from "@/views/admin/Reports";
-import Incidents from "@/views/admin/Incidents";
 import Team from "@/views/admin/Team";
 import Chatbot from "@/views/admin/ChatBot";
 
@@ -40,7 +38,7 @@ const routes = [
     layout: "/admin",
     path: "api-collection",
     icon: <BiCollection className="h-6 w-6" />,
-    component: <Reports />,
+    component: <></>,
   },
   {
     name: "API Endpoints",
@@ -54,14 +52,14 @@ const routes = [
     layout: "/admin",
     path: "testing",
     icon: <FaRegCirclePlay className="h-6 w-6" />,
-    component: <Reports />,
+    component: <></>,
   },
   {
     name: "Issues",
     layout: "/admin",
     path: "issues",
     icon: <MdReport className="h-6 w-6" />,
-    component: <Incidents />,
+    component: <></>,
   },
   {
     name: "VibraniumGPT",
