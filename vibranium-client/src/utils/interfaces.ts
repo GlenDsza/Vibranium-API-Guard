@@ -1,3 +1,5 @@
+import { Endpoint } from "@/app/features/EndpointSlice";
+
 export interface Property {
   name: string;
   type: string;
@@ -27,6 +29,17 @@ export interface Threat {
   severity: "Low" | "Medium" | "High";
   recommendations?: string;
   status: "Pending" | "Resolved";
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface Collection {
+  _id: string;
+  name: string;
+  description: string;
+  tags?: string;
+  endpoints: Endpoint[];
+  organization: string;
   createdAt: string;
   updatedAt: string;
 }

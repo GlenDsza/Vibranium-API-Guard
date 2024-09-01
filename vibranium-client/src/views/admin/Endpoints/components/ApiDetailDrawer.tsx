@@ -1,5 +1,5 @@
 import { Drawer } from "@material-tailwind/react";
-import { useEffect, useState, type FC } from "react";
+import { useEffect, useRef, useState, type FC } from "react";
 import { BiCollection } from "react-icons/bi";
 import { FaPlay, FaRegClock } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
@@ -17,6 +17,9 @@ import {
   AccordionBody,
 } from "@material-tailwind/react";
 import { Endpoint } from "@/app/features/EndpointSlice";
+import { Collection, Property } from "@/utils/interfaces";
+import axios from "axios";
+import { request } from "http";
 
 interface ApiDetailDrawerProps {
   open: boolean;
@@ -44,12 +47,32 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
     createdAt,
     updatedAt,
   } = endpoint;
+  // let newResponses = new Map<string, any>();
+  // for (const [key, value] of Object.entries(responses)) {
+  //   newResponses.set(key, value);
+  // }
+  // console.log(newResponses.forEach((value) => value));
   const [risk, setRisk] = useState<string>("Low");
   const [accOpen, setAccOpen] = useState<number>(0);
+  const [collections, setCollections] = useState<Collection[]>([]);
+  const [newResponses, setNewResponses] = useState<Map<string, any>>(new Map());
+  const opResponse = useRef<Map<string, any>>(null);
   const handleOpen = (value: number) =>
     setAccOpen(accOpen === value ? 0 : value);
 
   useEffect(() => {
+    computeRisk();
+    getRelatedCollections(_id);
+  }, [endpoint]);
+
+  useEffect(() => {
+    if (responses) {
+      console.log(responses);
+      getResponses();
+    }
+  }, [responses]);
+
+  const computeRisk = () => {
     let temp = threats.reduce((acc, threat) => {
       if (threat.severity === "High") {
         return "High";
@@ -60,7 +83,23 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
       }
     }, "None Detected");
     setRisk(temp);
-  }, [endpoint]);
+  };
+
+  const getRelatedCollections = async (id: string) => {
+    const res = await axios.get(
+      `${import.meta.env.VITE_BACKEND_URL}/api/collections?endpointId=${id}`
+    );
+    setCollections(res.data);
+  };
+
+  const getResponses = () => {
+    let temp = new Map<string, any>();
+    for (const [key, value] of Object.entries(responses)) {
+      temp.set(key, value);
+    }
+    setNewResponses(temp);
+    opResponse.current = temp;
+  };
 
   function NewIcon({ id, open }: { id: number; open: number }) {
     return (
@@ -138,7 +177,9 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
                 Collection
               </p>
             </div>
-            <p className="text-sm font-bold ms-3">{"collection"}</p>
+            <p className="text-sm font-bold ms-3">
+              {collections.map((collection) => collection.name).join(", ")}
+            </p>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -220,13 +261,13 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
               <Accordion
                 open={accOpen === 1}
                 icon={<NewIcon id={1} open={accOpen} />}
-                placeholder={undefined}
+                placeholder={true}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
               >
                 <AccordionHeader
                   onClick={() => handleOpen(1)}
-                  placeholder={undefined}
+                  placeholder={true}
                   onPointerEnterCapture={undefined}
                   onPointerLeaveCapture={undefined}
                 >
@@ -235,63 +276,156 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
                 <AccordionBody>
                   <div className="ms-3 grid grid-cols-3">
                     <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
-                      authorization
+                      request-body
                     </div>
                     <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
-                      JWT eyJhbGciOiJIUz6IkpXVCJ9.eyJzdWIiOiIxafgbasjt
+                      {requestBody ? "true" : "false"}
                     </div>
                   </div>
+
                   <hr className="m-3" />
-                  <div className="ms-3 grid grid-cols-3">
-                    <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
-                      content-length
-                    </div>
-                    <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
-                      2
-                    </div>
-                  </div>
-                  <hr className="m-3" />
-                  <div className="ms-3 grid grid-cols-3">
-                    <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
-                      content-type
-                    </div>
-                    <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
-                      application/json
-                    </div>
-                  </div>
-                  <hr className="m-3" />
-                  <div className="ms-3 grid grid-cols-3">
-                    <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
-                      host
-                    </div>
-                    <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
-                      localhost
-                    </div>
-                  </div>
+                  {requestBody ? (
+                    <>
+                      <div className="ms-3 grid grid-cols-3">
+                        <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                          content-type
+                        </div>
+                        <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                          application/json
+                        </div>
+                      </div>
+                      <hr className="m-3" />
+                      <div className="ms-3 grid grid-cols-3">
+                        <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                          schema
+                        </div>
+                        <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4 font-bold">
+                          {
+                            requestBody.content["application/json"].schemaRef
+                              .title
+                          }
+                        </div>
+                      </div>
+
+                      <hr className="m-3" />
+                      <div className="ms-3 grid grid-cols-3">
+                        <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                          required
+                        </div>
+                        <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4 font-bold">
+                          {`[`} &nbsp;
+                          {requestBody.content[
+                            "application/json"
+                          ].schemaRef.required
+                            .slice(0, -1)
+                            .map((item) => item)
+                            .join(", ") +
+                            ", " +
+                            requestBody.content[
+                              "application/json"
+                            ].schemaRef.required.slice(-1)[0]}
+                          &nbsp;{`]`}
+                        </div>
+                      </div>
+
+                      <div className="ms-3 bg-gray-100 dark:bg-navy-700 dark:text-white p-3 rounded-lg mt-3">
+                        {`{`}
+                        {requestBody.content[
+                          "application/json"
+                        ].schemaRef.properties.map((property) => (
+                          <>
+                            <div className="ms-3">
+                              <span className="text-blue-900 font-bold">
+                                {property.name}:
+                              </span>{" "}
+                              {property.type
+                                ? property.type
+                                : property.anyOf
+                                    .slice(0, -1)
+                                    .map((item) => item.type)
+                                    .join(" | ") +
+                                  " | " +
+                                  property.anyOf.slice(-1)[0].type}
+                            </div>
+                          </>
+                        ))}
+                        {`}`}
+                      </div>
+                    </>
+                  ) : (
+                    <></>
+                  )}
                 </AccordionBody>
               </Accordion>
               <Accordion
                 open={accOpen === 2}
                 icon={<NewIcon id={2} open={accOpen} />}
-                placeholder={undefined}
+                placeholder={true}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
               >
                 <AccordionHeader
                   onClick={() => handleOpen(2)}
-                  placeholder={undefined}
+                  placeholder={true}
                   onPointerEnterCapture={undefined}
                   onPointerLeaveCapture={undefined}
                 >
                   <p className="font-bold ms-3">Response</p>
                 </AccordionHeader>
                 <AccordionBody>
-                  <div className="ms-3">
-                    We&apos;re not always in the position that we want to be at.
-                    We&apos;re constantly growing. We&apos;re constantly making
-                    mistakes. We&apos;re constantly trying to express ourselves
-                    and actualize our dreams.
-                  </div>
+                  {opResponse.current &&
+                    Array.from(opResponse.current.entries()).map(
+                      ([key, value]) => {
+                        return (
+                          <div key={key} className="mb-8">
+                            <div className="ms-3 grid grid-cols-3">
+                              <div className="col-span-1 flex justify-start items-center font-poppins text-lg text-gray-600 dark:text-white font-bold">
+                                Response Code
+                              </div>
+                              <div className="col-span-2 flex justify-end items-center font-poppins text-gray-600 dark:text-white pe-4 text-lg font-bold">
+                                {key}
+                              </div>
+                            </div>
+                            <hr className="m-3" />
+                            <div className="ms-3 grid grid-cols-3">
+                              <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                                Description
+                              </div>
+                              <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                                {value.description}
+                              </div>
+                            </div>
+                            <hr className="m-3" />
+                            <div className="ms-3 grid grid-cols-3">
+                              <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                                content-type
+                              </div>
+                              <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                                application/json
+                              </div>
+                            </div>
+                            <div className="ms-3 bg-gray-100 dark:bg-navy-700 dark:text-white p-3 rounded-lg mt-3">
+                              {`{`}
+
+                              {value.content &&
+                                value.content[
+                                  "application/json"
+                                ].schemaRef.properties.map((property: any) => (
+                                  <>
+                                    <div className="ms-3">
+                                      <span className="text-blue-900 font-bold">
+                                        {property.name || property.title}:
+                                      </span>{" "}
+                                      {property.type}
+                                    </div>
+                                  </>
+                                ))}
+                              {`}`}
+                            </div>
+                          </div>
+                        );
+                      }
+                    )}
                 </AccordionBody>
               </Accordion>
             </TabPanel>

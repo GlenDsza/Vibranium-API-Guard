@@ -154,6 +154,58 @@ export const pieChartOptions = {
 
 export const pieChartData = [5, 2, 3, 1, 2];
 
+export const countryChartOptions = {
+  labels: [
+    "India",
+    "Pakistan",
+    "United States of America",
+    "China",
+    "United Kingdom",
+  ],
+  colors: ["#4318FF", "#6AD2FF", "#A8A8A8", "#050C9C", "#A7E6FF"],
+  chart: {
+    width: "50px",
+  },
+  states: {
+    hover: {
+      filter: {
+        type: "none",
+      },
+    },
+  },
+  legend: {
+    show: true,
+  },
+  dataLabels: {
+    enabled: true,
+  },
+  hover: { mode: null },
+  plotOptions: {
+    donut: {
+      expandOnClick: false,
+      donut: {
+        labels: {
+          show: true,
+        },
+      },
+    },
+  },
+  fill: {
+    colors: ["#4318FF", "#6AD2FF", "#A8A8A8", "#050C9C", "#A7E6FF"],
+  },
+  tooltip: {
+    enabled: true,
+    theme: "dark",
+    style: {
+      fontSize: "12px",
+      fontFamily: undefined,
+      backgroundColor: "#000000",
+    },
+  },
+};
+
+export const countryChartData = [7, 1, 3, 12, 2];
+
 export const lineChartDataTotalSpent = [
   {
     name: "Revenue",
