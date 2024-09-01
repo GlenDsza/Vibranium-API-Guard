@@ -50,7 +50,7 @@ not_found_timestamps = defaultdict(deque)
 blocked_ips = set()
 
 # Allowed IPs (for demonstration purposes, only allow local IPs)
-ALLOWED_IPS = ["127.0.0.1", "::1"]
+MANUAL_BLOCKED_IPS = set()
 
 # XSS Filtering Pattern
 XSS_PATTERN = re.compile(r"<.*?>")
@@ -109,7 +109,7 @@ def not_found_limited(ip):
 
 def is_valid_ip(ip):
     """Check if the IP address is allowed."""
-    valid = ip in ALLOWED_IPS
+    valid = ip not in MANUAL_BLOCKED_IPS
     if not valid:
         logging.warning(f"Blocked request from invalid IP: {ip}")
     return valid
@@ -163,9 +163,7 @@ def proxy(url):
     if rate_limited(client_ip):
         return Response("Rate limit exceeded. Try again later.", status=429)
 
-    target_url = (
-        f"{SERVER_URL}/{url}"  # Forward to Node.js server running on port 5173
-    )
+    target_url = f"{SERVER_URL}/{url}"  # Forward to Node.js server running on port 5173
 
     disabled_endpoints = endpoints.find({"enabled": False})
     disabled_endpoints_urls = []
