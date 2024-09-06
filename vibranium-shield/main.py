@@ -3,21 +3,19 @@ from flask import Flask, request, Response
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 import requests
-from collections import defaultdict, deque
-import time
-import re
+from lib.Protector import rate_limited, is_valid_ip, sanitize_input, NotFoundLimiter
 from lib.URLMatcher import URLMatcher
-
 import os
 from dotenv import load_dotenv
 
 load_dotenv()
 
+
+# Initialize the database connection
 MONGODB_URI = os.getenv("MONGODB_URI")
 SERVER_URL = os.getenv("SERVER_URL")
 
 client = MongoClient(MONGODB_URI, server_api=ServerApi("1"))
-
 try:
     client.admin.command("ping")
     print("Pinged your deployment. You successfully connected to MongoDB!")
@@ -36,90 +34,8 @@ logging.basicConfig(
     handlers=[logging.FileHandler("proxy_server.log"), logging.StreamHandler()],
 )
 
-# Rate limiting parameters
-RATE_LIMIT = 10  # Number of requests allowed
-WINDOW_SIZE = 60  # Window size in seconds
-
-# 404 rate limiting parameters
-MAX_404 = 3  # Maximum allowed 404 responses per IP per minute
-REQUEST_TIMEOUT = 60  # Time in seconds to reset 404 count
-
-# Dictionary to track request timestamps for each IP
-request_timestamps = defaultdict(deque)
-not_found_timestamps = defaultdict(deque)
-blocked_ips = set()
-
-# Allowed IPs (for demonstration purposes, only allow local IPs)
-MANUAL_BLOCKED_IPS = set()
-
-# XSS Filtering Pattern
-XSS_PATTERN = re.compile(r"<.*?>")
-
-# SQL Injection Filtering Pattern
-SQLI_PATTERN = re.compile(
-    r"(\'|\")|(--)|(;)|(\b(SELECT|INSERT|DELETE|UPDATE|DROP|UNION|ALTER|CREATE)\b)",
-    re.IGNORECASE,
-)
-
-
-def rate_limited(ip):
-    current_time = time.time()
-    if ip not in request_timestamps:
-        request_timestamps[ip] = deque()
-
-    timestamps = request_timestamps[ip]
-
-    # Remove timestamps older than the sliding window
-    while timestamps and timestamps[0] < current_time - WINDOW_SIZE:
-        timestamps.popleft()
-
-    # Check if the rate limit is exceeded
-    if len(timestamps) >= RATE_LIMIT:
-        logging.warning(f"Rate limit exceeded for IP: {ip}")
-        return True
-
-    # Record the new request
-    timestamps.append(current_time)
-    return False
-
-
-def not_found_limited(ip):
-    current_time = time.time()
-    if ip not in not_found_timestamps:
-        not_found_timestamps[ip] = deque()
-
-    timestamps = not_found_timestamps[ip]
-
-    # Remove timestamps older than the sliding window
-    while timestamps and timestamps[0] < current_time - REQUEST_TIMEOUT:
-        timestamps.popleft()
-    if ip in blocked_ips and not timestamps:
-        blocked_ips.remove(ip)
-
-    # Check if the 404 limit is exceeded
-    if len(timestamps) >= MAX_404:
-        blocked_ips.add(ip)  # Block all future requests from this IP
-        logging.warning(f"Blocked IP: {ip} due to too many 404s")
-        return True
-
-    # Record the 404 response
-    timestamps.append(current_time)
-    return False
-
-
-def is_valid_ip(ip):
-    """Check if the IP address is allowed."""
-    valid = ip not in MANUAL_BLOCKED_IPS
-    if not valid:
-        logging.warning(f"Blocked request from invalid IP: {ip}")
-    return valid
-
-
-def sanitize_input(data):
-    """Remove potentially harmful scripts (XSS) and SQL injection attempts."""
-    sanitized_data = XSS_PATTERN.sub("", data)
-    sanitized_data = SQLI_PATTERN.sub("", sanitized_data)
-    return sanitized_data
+# Initialize the and 404 limiter
+not_found_limiter = NotFoundLimiter()
 
 
 @app.before_request
@@ -148,7 +64,7 @@ def filter_xss_sql_injection():
 def filter_ip():
     """Filter out requests from blocked IPs."""
     client_ip = request.remote_addr
-    if client_ip in blocked_ips:
+    if not_found_limiter.find_not_found_limited(client_ip):
         logging.warning(f"Blocked request from IP: {client_ip}")
         return Response(
             "Your IP has been blocked due to excessive 404 errors.", status=403
@@ -213,7 +129,7 @@ def proxy(url):
         return Response(f"An error occurred", status=500)
 
     if resp.status_code == 404:
-        if not_found_limited(client_ip):
+        if not_found_limiter.add_not_found_limited(client_ip):
             return Response(
                 "Too many 404 errors. Your IP has been blocked.", status=403
             )
