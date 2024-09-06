@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   createColumnHelper,
   FilterFn,
@@ -12,6 +12,8 @@ import {
 import { MdLockOpen } from "react-icons/md";
 import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
 import Card from "@/components/card";
+import { getBlacklistedIps, maybeBlockIp } from "@/apis/blacklist";
+import { toast } from "react-toastify";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -32,14 +34,35 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 
 type RowObj = {
   ip: string;
-  actions: string;
 };
 
-const EndpointTable = (props: { tableData: any }) => {
+const EndpointTable = ({ tableData }: { tableData: RowObj[] }) => {
   const columnHelper = createColumnHelper<RowObj>();
-  const { tableData } = props;
 
   const [sorting, setSorting] = useState<SortingState>([]);
+
+  useEffect(() => {
+    getBlacklistedIps(
+      localStorage.getItem("organization") || "66d3f5019ce5c53aeb973d6e"
+    ).then((res) => {
+      if (res.success) {
+        _(res.data.map((item: any) => ({ ip: item })));
+      }
+    });
+  }, [tableData]);
+
+  const unblockIp = (ip: string) => {
+    const orgid =
+      localStorage.getItem("organization") || "66d3f5019ce5c53aeb973d6e";
+    maybeBlockIp(orgid, ip, false).then((res) => {
+      if (res.success) {
+        _(data.filter((item) => item.ip !== ip));
+        toast.success("Ip Unblocked Successfully");
+      } else {
+        toast.error("Failed to unblock IP");
+      }
+    });
+  };
 
   const columns = [
     columnHelper.accessor("ip", {
@@ -55,7 +78,7 @@ const EndpointTable = (props: { tableData: any }) => {
         </p>
       ),
     }),
-    columnHelper.accessor("actions", {
+    columnHelper.display({
       id: "actions",
       header: () => (
         <p className="mr-1 inline text-sm font-bold w-1/4 text-gray-600 dark:text-white">
@@ -66,7 +89,7 @@ const EndpointTable = (props: { tableData: any }) => {
         <div className="flex items-center space-x-2">
           <button
             onClick={() => {
-              console.log("Play button clicked", info);
+              unblockIp(info.row.values.ip);
             }}
             className={` flex items-center justify-center rounded-lg bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
@@ -78,7 +101,7 @@ const EndpointTable = (props: { tableData: any }) => {
     }),
   ]; // eslint-disable-next-line
 
-  const [data, _] = useState(() => [...tableData]);
+  const [data, _] = useState([]);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const table = useReactTable({
     data,
