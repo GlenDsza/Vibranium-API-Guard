@@ -5,6 +5,7 @@ import { ipaddresses, TempIP } from "@/constants/miscellaneous";
 import { FC, useState } from "react";
 import { MdLock } from "react-icons/md";
 import { toast } from "react-toastify";
+import { maybeBlockIp } from "@/apis/blacklist";
 
 interface ApiDetailDrawerProps {
   open: boolean;
@@ -15,11 +16,19 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({ open, hide }) => {
   const [myips, setMyIps] = useState<TempIP[]>(ipaddresses);
   const [inputip, setInputIp] = useState<string>("");
 
-  const addIp = () => {
+  const blockIp = () => {
     if (inputip) {
-      setMyIps([...myips, { ip: inputip }]);
-      setInputIp("");
-      toast.success("Ip Blocked Successfully");
+      const orgid =
+        localStorage.getItem("organization") || "66d3f5019ce5c53aeb973d6e";
+      maybeBlockIp(orgid, inputip, true).then((res) => {
+        if (res.success) {
+          setMyIps([...myips, { ip: inputip }]);
+          setInputIp("");
+          toast.success("Ip Blocked Successfully");
+        } else {
+          toast.error("Failed to block IP");
+        }
+      });
     }
   };
 
@@ -56,7 +65,7 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({ open, hide }) => {
         <button
           className={`w-16  flex items-center justify-center rounded-2xl bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
-          onClick={addIp}
+          onClick={blockIp}
         >
           <MdLock className="h-5 w-5 text-red-500 " />
         </button>
