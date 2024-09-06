@@ -3,7 +3,7 @@ from flask import Flask, request, Response
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 import requests
-from lib.Protector import rate_limited, is_valid_ip, sanitize_input, NotFoundLimiter
+from lib.Protector import rate_limited, Protector, NotFoundLimiter
 from lib.URLMatcher import URLMatcher
 import os
 from dotenv import load_dotenv
@@ -24,6 +24,12 @@ except Exception as e:
 
 db = client["test"]
 endpoints = db["endpoints"]
+org = db["organizations"].find_one({"name": "Flipkart"})
+
+if org and "blockedIps" in org:
+    protector = Protector(blocked_ips=org["blockedIps"])
+else:
+    protector = Protector()
 
 app = Flask(__name__)
 
@@ -42,7 +48,7 @@ not_found_limiter = NotFoundLimiter()
 def filter_ip():
     """Filter out requests from non-allowed IPs."""
     client_ip = request.remote_addr
-    if not is_valid_ip(client_ip):
+    if not protector.is_valid_ip(client_ip):
         return Response("Forbidden: Invalid IP Address", status=403)
 
 
@@ -50,13 +56,17 @@ def filter_ip():
 def filter_xss_sql_injection():
     """Sanitize all incoming data to prevent XSS and SQL injection."""
     if request.data:
-        sanitized_data = sanitize_input(request.data.decode("utf-8"))
+        sanitized_data = protector.sanitize_input(request.data.decode("utf-8"))
         request._cached_data = sanitized_data.encode("utf-8")
     if request.args:
-        sanitized_args = {k: sanitize_input(v) for k, v in request.args.items()}
+        sanitized_args = {
+            k: protector.sanitize_input(v) for k, v in request.args.items()
+        }
         request.args = sanitized_args
     if request.form:
-        sanitized_form = {k: sanitize_input(v) for k, v in request.form.items()}
+        sanitized_form = {
+            k: protector.sanitize_input(v) for k, v in request.form.items()
+        }
         request.form = sanitized_form
 
 

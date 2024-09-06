@@ -10,17 +10,36 @@ WINDOW_SIZE = 60  # Window size in seconds
 # Dictionary to track request timestamps for each IP
 request_timestamps = defaultdict(deque)
 
-# Allowed IPs (for demonstration purposes, only allow local IPs)
-MANUAL_BLOCKED_IPS = set()
 
-# XSS Filtering Pattern
-XSS_PATTERN = re.compile(r"<.*?>")
+class Protector:
 
-# SQL Injection Filtering Pattern
-SQLI_PATTERN = re.compile(
-    r"(\'|\")|(--)|(;)|(\b(SELECT|INSERT|DELETE|UPDATE|DROP|UNION|ALTER|CREATE)\b)",
-    re.IGNORECASE,
-)
+    MANUAL_BLOCKED_IPS: set
+
+    # XSS Filtering Pattern
+    XSS_PATTERN = re.compile(r"<.*?>")
+
+    # SQL Injection Filtering Pattern
+    SQLI_PATTERN = re.compile(
+        r"(\'|\")|(--)|(;)|(\b(SELECT|INSERT|DELETE|UPDATE|DROP|UNION|ALTER|CREATE)\b)",
+        re.IGNORECASE,
+    )
+
+    def __init__(self, blocked_ips: list = []) -> None:
+
+        self.MANUAL_BLOCKED_IPS = set(blocked_ips)
+
+    def is_valid_ip(self, ip):
+        """Check if the IP address is allowed."""
+        valid = ip not in self.MANUAL_BLOCKED_IPS
+        if not valid:
+            logging.warning(f"Blocked request from invalid IP: {ip}")
+        return valid
+
+    def sanitize_input(self, data):
+        """Remove potentially harmful scripts (XSS) and SQL injection attempts."""
+        sanitized_data = self.XSS_PATTERN.sub("", data)
+        sanitized_data = self.SQLI_PATTERN.sub("", sanitized_data)
+        return sanitized_data
 
 
 class NotFoundLimiter:
@@ -83,18 +102,3 @@ def rate_limited(ip):
     # Record the new request
     timestamps.append(current_time)
     return False
-
-
-def is_valid_ip(ip):
-    """Check if the IP address is allowed."""
-    valid = ip not in MANUAL_BLOCKED_IPS
-    if not valid:
-        logging.warning(f"Blocked request from invalid IP: {ip}")
-    return valid
-
-
-def sanitize_input(data):
-    """Remove potentially harmful scripts (XSS) and SQL injection attempts."""
-    sanitized_data = XSS_PATTERN.sub("", data)
-    sanitized_data = SQLI_PATTERN.sub("", sanitized_data)
-    return sanitized_data
