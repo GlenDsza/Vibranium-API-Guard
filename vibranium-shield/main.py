@@ -166,30 +166,48 @@ def proxy(url):
     target_url = f"{SERVER_URL}/{url}"  # Forward to Node.js server running on port 5173
 
     disabled_endpoints = endpoints.find({"enabled": False})
-    disabled_endpoints_urls = []
-
-    for endpoint in disabled_endpoints:
-        if "path" in endpoint:
-            disabled_endpoints_urls.append(endpoint["path"])
-
-    matcher = URLMatcher(disabled_endpoints_urls)
-    if matcher.checkMatch(url):
+    matcher = URLMatcher(list(disabled_endpoints))
+    if matcher.checkMatch(url, request.method):
         return Response("This endpoint is disabled.", status=403)
 
     try:
-        if request.method == "GET":
-            logging.info(f"GET request to {target_url} from IP: {client_ip}")
-            resp = requests.get(
-                target_url,
-                headers={key: value for key, value in request.headers if key != "Host"},
-            )
-        else:
-            logging.info(f"POST request to {target_url} from IP: {client_ip}")
-            resp = requests.post(
-                target_url,
-                data=request.form,
-                headers={key: value for key, value in request.headers if key != "Host"},
-            )
+        match request.method:
+            case "GET":
+                logging.info(f"GET request to {target_url} from IP: {client_ip}")
+                resp = requests.get(
+                    target_url,
+                    headers={
+                        key: value for key, value in request.headers if key != "Host"
+                    },
+                )
+            case "POST":
+                logging.info(f"POST request to {target_url} from IP: {client_ip}")
+                resp = requests.post(
+                    target_url,
+                    data=request.form,
+                    headers={
+                        key: value for key, value in request.headers if key != "Host"
+                    },
+                )
+            case "PUT":
+                logging.info(f"PUT request to {target_url} from IP: {client_ip}")
+                resp = requests.put(
+                    target_url,
+                    data=request.form,
+                    headers={
+                        key: value for key, value in request.headers if key != "Host"
+                    },
+                )
+            case "DELETE":
+                logging.info(f"DELETE request to {target_url} from IP: {client_ip}")
+                resp = requests.delete(
+                    target_url,
+                    headers={
+                        key: value for key, value in request.headers if key != "Host"
+                    },
+                )
+            case _:
+                return Response("Method not allowed", status=405)
     except requests.RequestException as e:
         logging.error(f"Error during request to {target_url}: {e}")
         return Response(f"An error occurred", status=500)
