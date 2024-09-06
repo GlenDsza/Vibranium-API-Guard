@@ -1,10 +1,12 @@
 import logging
+from time import time
 from flask import Flask, request, Response
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 import requests
 from lib.Protector import rate_limited, Protector, NotFoundLimiter
 from lib.URLMatcher import URLMatcher
+from lib.TrafficManager import TrafficManager
 import os
 from dotenv import load_dotenv
 
@@ -42,6 +44,15 @@ logging.basicConfig(
 
 # Initialize the and 404 limiter
 not_found_limiter = NotFoundLimiter()
+
+# Initialize the traffic manager
+traffic_manager = TrafficManager(db["traffic"])
+
+
+@app.after_request
+def log_traffic(response):
+    traffic_manager.log_traffic(request, response)
+    return response
 
 
 @app.before_request
