@@ -20,6 +20,18 @@ const organizationSchema = new mongoose.Schema(
     blockedIps: {
       type: [String],
     },
+    testingCredentials: {
+      userId: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+      token: {
+        type: String,
+        required: true,
+        trim: true,
+      },
+    },
   },
   {
     timestamps: true,

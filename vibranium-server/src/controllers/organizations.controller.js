@@ -58,3 +58,48 @@ export const deleteOrganization = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+export const blockUnblockIp = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { ip, block } = req.body;
+    if (!ip) {
+      return res.status(400).json({ message: "IP is required" });
+    }
+    let organization;
+    if (block === undefined || block === true) {
+      organization = await Organization.findByIdAndUpdate(
+        id,
+        { $addToSet: { blockedIps: ip } }, // $addToSet prevents duplicates
+        { new: true } // Return the updated document
+      );
+    } else {
+      organization = await Organization.findByIdAndUpdate(
+        id,
+        { $pull: { blockedIps: ip } }, // $pull removes the specified value from an array
+        { new: true } // Return the updated document
+      );
+    }
+
+    if (!organization) {
+      return res.status(400).json({ message: "Organization not found" });
+    }
+
+    res.status(200).json(organization);
+  } catch (error) {
+    res.status(500).json({ message: "Error adding IP to blocked list", error });
+  }
+};
+
+export const getBlockedIps = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const organization = await Organization.findById(id);
+    if (!organization) {
+      return res.status(400).json({ message: "Organization not found" });
+    }
+    res.status(200).json(organization.blockedIps);
+  } catch (error) {
+    res.status(500).json({ message: "Error getting blocked IPs", error });
+  }
+};
