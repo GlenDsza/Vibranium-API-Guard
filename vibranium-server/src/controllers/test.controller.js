@@ -1,12 +1,12 @@
-import Endpoint from "../models/endpoint.model";
-import Organization from "../models/organization.model";
-import Schema from "../models/schema.model";
+import Endpoint from "../models/endpoint.model.js";
+import Organization from "../models/organization.model.js";
+import Schema from "../models/schema.model.js";
 import {
   testBOLA,
   testBrokenAuth,
   testPasswordLeak,
-} from "../tests/endpointtests";
-import { FASTAPI_URL } from "../config";
+} from "../tests/endpointtests.js";
+import { FASTAPI_URL } from "../config.js";
 
 export const testEndpoint = async (req, res) => {
   const { id } = req.params;
