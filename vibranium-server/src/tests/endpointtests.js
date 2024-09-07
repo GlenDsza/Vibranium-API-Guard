@@ -1,4 +1,6 @@
 import axios from "axios";
+import Threats from "../models/threat.model.js";
+
 function maketoken(length) {
   let result = "";
   const characters =
@@ -13,12 +15,15 @@ function maketoken(length) {
 }
 
 // Function to test for BOLA by trying to access a restricted resource
-export async function testBOLA(baseUrl, endpoint, token, userId) {
-  for (let i = 0; i < 3; i++) {
+export async function testBOLA(baseUrl, endpoint, token, userId, endpointId) {
+  if (parseInt(userId) !== NaN) {
+    userId = parseInt(userId);
+  }
+  for (let i = 1; i < 3; i++) {
     let userResponse1;
     let userResponse2;
     try {
-      userResponse1 = await axios.get(`${baseUrl}${endpoint}/${userId + i}`, {
+      userResponse1 = await axios.get(`${baseUrl}${endpoint}${userId + i}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -37,7 +42,7 @@ export async function testBOLA(baseUrl, endpoint, token, userId) {
       }
     }
     try {
-      userResponse2 = await axios.get(`${baseUrl}${endpoint}/${userId - i}`, {
+      userResponse2 = await axios.get(`${baseUrl}${endpoint}${userId - i}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -53,17 +58,38 @@ export async function testBOLA(baseUrl, endpoint, token, userId) {
         continue;
       } else {
         console.error("Error:", error.message);
+        return { success: false, message: error.message };
       }
     }
 
     if (userResponse1.status === 200 || userResponse2.status === 200) {
-      console.log("BOLA vulnerability found!");
-      break;
+      await Threats.deleteMany({
+        endpoint: endpointId,
+        name: "BOLA",
+      });
+
+      await Threats.create({
+        endpoint: endpointId,
+        name: "BOLA",
+        description: "BOLA vulnerability found",
+        type: "Authorization",
+        severity: "High",
+        recommendations: "Implement user specific authorization checks",
+        status: "Pending",
+      });
+      return { success: false, message: "BOLA vulnerability found" };
     }
   }
+  return { success: true, message: "BOLA vulnerability not found" };
 }
 
-export async function testBrokenAuth(baseUrl, endpoint, method = "GET", payload = {}) {
+export async function testBrokenAuth(
+  baseUrl,
+  endpoint,
+  endpointId,
+  method = "GET",
+  payload = {}
+) {
   try {
     let response;
     switch (method.toUpperCase()) {
@@ -84,8 +110,24 @@ export async function testBrokenAuth(baseUrl, endpoint, method = "GET", payload 
         break;
     }
     if (response.status === 200) {
-      console.log("Broken Authentication vulnerability found!");
-      return;
+      await Threats.deleteMany({
+        endpoint: endpointId,
+        name: "Broken Authentication",
+      });
+
+      await Threats.create({
+        endpoint: endpointId,
+        name: "Broken Authentication",
+        description: "Broken Authentication vulnerability found",
+        type: "Authentication",
+        severity: "High",
+        recommendations: "Secure endpoint with token based authentication",
+        status: "Pending",
+      });
+      return {
+        success: false,
+        message: "Broken Authentication vulnerability found",
+      };
     }
   } catch (error) {
     if (
@@ -97,6 +139,7 @@ export async function testBrokenAuth(baseUrl, endpoint, method = "GET", payload 
     ) {
     } else {
       console.error("Error:", error.message);
+      return { success: false, message: error.message };
     }
   }
   try {
@@ -140,7 +183,24 @@ export async function testBrokenAuth(baseUrl, endpoint, method = "GET", payload 
         break;
     }
     if (response.status === 200) {
-      console.log("Broken Authentication vulnerability found!");
+      await Threats.deleteMany({
+        endpoint: endpointId,
+        name: "Broken Authentication",
+      });
+
+      await Threats.create({
+        endpoint: endpointId,
+        name: "Broken Authentication",
+        description: "Broken Authentication vulnerability found",
+        type: "Authentication",
+        severity: "High",
+        recommendations: "Do not accept invalid tokens",
+        status: "Pending",
+      });
+      return {
+        success: false,
+        message: "Broken Authentication vulnerability found",
+      };
     }
   } catch (error) {
     if (
@@ -152,11 +212,22 @@ export async function testBrokenAuth(baseUrl, endpoint, method = "GET", payload 
     ) {
     } else {
       console.error("Error:", error.message);
+      return { success: false, message: error.message };
     }
   }
+  return {
+    success: true,
+    message: "Broken Authentication vulnerability not found",
+  };
 }
 
-export async function testPasswordLeak(endpoint, token, method = "GET", payload = {}) {
+export async function testPasswordLeak(
+  endpoint,
+  token,
+  endpointId,
+  method = "GET",
+  payload = {}
+) {
   try {
     let response;
     switch (method.toUpperCase()) {
@@ -198,11 +269,32 @@ export async function testPasswordLeak(endpoint, token, method = "GET", payload 
     if (response.status === 200) {
       const regex = /.*_password|pass|password|hashed_password/i;
       if (regex.test(JSON.stringify(response.data))) {
-        console.log("Password leak vulnerability found!");
+        await Threats.deleteMany({
+          endpoint: endpointId,
+          name: "Excessive Data Exposure",
+        });
+
+        await Threats.create({
+          endpoint: endpointId,
+          name: "Excessive Data Exposure",
+          description: "Password leak vulnerability found",
+          type: "Data Exposure",
+          severity: "Medium",
+          recommendations: "Do not expose passwords in response",
+          status: "Pending",
+        });
+        return { success: false, message: "Password leak vulnerability found" };
       }
     }
+    return { success: true, message: "Password leak vulnerability not found" };
   } catch (error) {
     console.error("Error:", error.message);
+
+    if (error.response && error.response.status === 401) {
+      return { success: false, message: "Inconclusive, Invalid credentials" };
+    }
+
+    return { success: false, message: error.message };
   }
 }
 
