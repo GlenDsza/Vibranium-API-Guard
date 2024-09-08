@@ -1,18 +1,12 @@
 import axios from "axios";
 import Threats from "../models/threat.model.js";
-
-function maketoken(length) {
-  let result = "";
-  const characters =
-    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-  const charactersLength = characters.length;
-  let counter = 0;
-  while (counter < length) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    counter += 1;
-  }
-  return result;
-}
+import {
+  excessiveArray,
+  excessiveObject,
+  excessiveString,
+  maketoken,
+  checkIsHashed,
+} from "./helpers.js";
 
 // Function to test for BOLA by trying to access a restricted resource
 export async function testBOLA(baseUrl, endpoint, token, userId, endpointId) {
@@ -58,7 +52,7 @@ export async function testBOLA(baseUrl, endpoint, token, userId, endpointId) {
         continue;
       } else {
         console.error("Error:", error.message);
-        return { success: false, message: error.message };  
+        return { success: false, message: error.message };
       }
     }
 
@@ -283,6 +277,32 @@ export async function testPasswordLeak(
           recommendations: "Do not expose passwords in response",
           status: "Pending",
         });
+
+        // extract password from payload
+        let password = "";
+        for (const key in response.data) {
+          if (regex.test(key)) {
+            password = response.data[key];
+            break;
+          }
+        }
+
+        if (!checkIsHashed(password)) {
+          await Threats.deleteMany({
+            endpoint: endpointId,
+            name: "Unhashed Password",
+          });
+          await Threats.create({
+            endpoint: endpointId,
+            name: "Unhashed Password",
+            description: "Unhashed password found",
+            type: "Data Exposure",
+            severity: "High",
+            recommendations: "Hash passwords before storing them",
+            status: "Pending",
+          });
+        }
+
         return { success: false, message: "Password leak vulnerability found" };
       }
     }
@@ -295,6 +315,157 @@ export async function testPasswordLeak(
     }
 
     return { success: false, message: error.message };
+  }
+}
+
+export async function testSecurityHeaders(
+  baseUrl,
+  endpoint,
+  token,
+  endpointId,
+  method = "GET",
+  payload = {}
+) {
+  // Define the required headers
+  const requiredHeaders = [
+    "content-security-policy",
+    "strict-transport-security",
+    "x-frame-options",
+    "x-content-type-options",
+    "x-xss-protection",
+    "referrer-policy",
+    "permissions-policy",
+  ];
+
+  try {
+    let response;
+    switch (method.toUpperCase()) {
+      case "GET":
+        response = await axios.get(`${baseUrl}${endpoint}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        break;
+      case "POST":
+        response = await axios.post(`${baseUrl}${endpoint}`, payload, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        break;
+      case "PUT":
+        response = await axios.put(`${baseUrl}${endpoint}`, payload, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        break;
+      case "DELETE":
+        response = await axios.delete(`${baseUrl}${endpoint}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        break;
+      default:
+        response = await axios.get(`${baseUrl}${endpoint}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+    }
+
+    // Check if required headers are present
+    const missingHeaders = requiredHeaders.filter(
+      (header) => !(header in response.headers)
+    );
+
+    if (missingHeaders.length === 0) {
+      return { success: true, message: "All required headers are present." };
+    } else {
+      await Threats.deleteMany({
+        endpoint: endpointId,
+        name: "Security Headers",
+      });
+
+      await Threats.create({
+        endpoint: endpointId,
+        name: "Security Headers",
+        description: "Security headers missing",
+        type: "Security",
+        severity: "Medium",
+        recommendations: "Add required security headers",
+        status: "Pending",
+      });
+      return { success: false, message: "Missing headers:", missingHeaders };
+    }
+  } catch (error) {
+    console.log(payload);
+    console.error("Error:", error.message);
+    return { success: false, message: error.message };
+  }
+}
+
+export async function testParamLimits(
+  baseUrl,
+  endpoint,
+  token,
+  endpointId,
+  payload
+) {
+  if (Object.keys(payload).length === 0) {
+    return { success: true, message: "No payload provided" };
+  }
+  const excessivePayload = {};
+  for (const key in payload) {
+    if (typeof payload[key] === "string") {
+      excessivePayload[key] = excessiveString;
+    } else if (Array.isArray(payload[key])) {
+      excessivePayload[key] = excessiveArray;
+    } else if (typeof payload[key] === "object") {
+      excessivePayload[key] = excessiveObject;
+    } else {
+      excessivePayload[key] = payload[key];
+    }
+  }
+  try {
+    const response = await axios.post(
+      `${baseUrl}${endpoint}`,
+      excessivePayload,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (response.status === 200) {
+      await Threats.deleteMany({
+        endpoint: endpointId,
+        name: "Unrestricted Resource Consumption",
+      });
+
+      await Threats.create({
+        endpoint: endpointId,
+        name: "Unrestricted Resource Consumption",
+        description: "Parameter limit vulnerability found",
+        type: "Unrestricted Resource Consumption",
+        severity: "Medium",
+        recommendations: "Limit the size of request parameters",
+        status: "Pending",
+      });
+      return { success: false, message: "Parameter limit vulnerability found" };
+    }
+  } catch (error) {
+    if (error.response && error.response.status === 422) {
+      return {
+        success: true,
+        message: "Parameter limit vulnerability not found",
+      };
+    } else {
+      console.error("Error:", error.message);
+      return { success: false, message: error.message };
+    }
   }
 }
 
