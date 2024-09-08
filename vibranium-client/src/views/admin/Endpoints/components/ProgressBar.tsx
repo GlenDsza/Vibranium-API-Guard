@@ -1,9 +1,4 @@
-import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalBody,
-} from "@chakra-ui/modal";
+import { Modal, ModalOverlay, ModalContent, ModalBody } from "@chakra-ui/modal";
 import Card from "@/components/card";
 import { useEffect, useState } from "react";
 import Multiselect from "multiselect-react-dropdown";
@@ -27,13 +22,10 @@ interface FormState {
   organization: string;
 }
 
-const ProgressBar = ({
-  isOpen,
-  onClose
-}: updateIncidentModalProps) => {
+const ProgressBar = ({ isOpen, onClose }: updateIncidentModalProps) => {
   const stateEndpoints = useAppSelector((state) => state.endpoints.data);
   const [endpointObjs, setEndpointObjs] = useState([]);
-  const [ prog, setProg ] = useState(0);
+  const [prog, setProg] = useState(0);
   const navigate: NavigateFunction = useNavigate();
 
   const handleSubmit = () => {
@@ -62,15 +54,15 @@ const ProgressBar = ({
 
     const interval = setInterval(() => {
       const num = Math.floor(Math.random() * 10);
-      setProg(prog => {
+      setProg((prog) => {
         if (prog < 100) {
           return prog + num;
         } else {
-          clearInterval(interval);  // Stop the interval when prog reaches 100
-          setProg(100);  // Ensure it doesn't go above 100
+          clearInterval(interval); // Stop the interval when prog reaches 100
+          setProg(100); // Ensure it doesn't go above 100
           onClose();
           navigate("/admin/testing");
-          return prog;  // Return the current value of prog
+          return prog; // Return the current value of prog
         }
       });
     }, 1000);
@@ -98,7 +90,7 @@ const ProgressBar = ({
               >
                 Running Tests
               </h1>
-              <Progress value={prog} color="red"/>
+              <Progress value={prog} color="red" />
               <div className="flex flex-col justify-center items-center mt-5">
                 <h2>{prog}%</h2>
               </div>

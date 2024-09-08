@@ -1,7 +1,7 @@
 export const barChartDataDailyTraffic = [
   {
     name: "APIs",
-    data: [4, 5, 14],
+    data: [1, 2, 2],
   },
 ];
 

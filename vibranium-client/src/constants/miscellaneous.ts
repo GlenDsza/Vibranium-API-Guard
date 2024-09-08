@@ -1,18 +1,18 @@
 export const apisForCoverage: { name: string; coverage: number }[] = [
   {
-    name: "Login APIs",
+    name: "Auth APIs",
     coverage: 80,
   },
   {
-    name: "Signup APIs",
+    name: "Cart APIs",
     coverage: 90,
   },
   {
-    name: "Payment APIs",
+    name: "Products APIs",
     coverage: 70,
   },
   {
-    name: "Profile APIs",
+    name: "Order APIs",
     coverage: 60,
   },
   {

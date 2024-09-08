@@ -37,6 +37,16 @@ const threats: any[] = [
   },
   {
     endpoint: "60b8d295f3e28c001c8e4b3f",
+    path: "/products",
+    method: "POST",
+    name: "Unsafe Consumption of External APIs",
+    description: "Unsafe consumption of external APIs detected.",
+    type: "API Consumption",
+    severity: "Low",
+    status: "Pending",
+  },
+  {
+    endpoint: "60b8d295f3e28c001c8e4b3f",
     path: "/orders",
     method: "GET",
     name: "Insecure Deserialization",
