@@ -17,7 +17,7 @@ export const getThreats = async (req, res) => {
   }
 
   try {
-    const threats = await Threat.find(wherePayload);
+    const threats = await Threat.find(wherePayload).populate("endpoint");
     return res.status(200).json(threats);
   } catch (error) {
     console.error(error);
@@ -40,11 +40,13 @@ export const createThreat = async (req, res) => {
 // Controller to update a threat
 export const updateThreat = async (req, res) => {
   try {
+    console.log(req.body);
     const updatedThreat = await Threat.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true }
     );
+    console.log(updatedThreat);
     res.status(200).json(updatedThreat);
   } catch (error) {
     res.status(400).json({ message: error.message });
