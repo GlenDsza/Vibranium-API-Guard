@@ -31,7 +31,7 @@ export const fetchTeam = createAsyncThunk(
           import.meta.env.VITE_BACKEND_URL
         }/api/users?organization=${organization}`
       );
-      console.log(res.data);
+      // console.log(res.data);
       return res.data;
     } catch (error) {
       console.log(error);

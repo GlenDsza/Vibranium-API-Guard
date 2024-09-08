@@ -58,7 +58,7 @@ export async function testBOLA(baseUrl, endpoint, token, userId, endpointId) {
         continue;
       } else {
         console.error("Error:", error.message);
-        return { success: false, message: error.message };
+        return { success: false, message: error.message };  
       }
     }
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   createColumnHelper,
   FilterFn,
@@ -13,6 +13,7 @@ import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
 import Card from "@/components/card";
 import { FiSearch } from "react-icons/fi";
 import Pagination from "@/components/pagination/Pagination";
+import { getTests } from "@/apis/tests";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -34,13 +35,14 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 type RowObj = {
   method: string;
   endpoint: string;
-  risk: string;
-  passed: boolean;
+  date: string;
+  tests_performed: number;
+  tests_passed: number;
+  status: boolean;
 };
 
-const EndpointTable = (props: { tableData: any }) => {
+const EndpointTable = () => {
   const columnHelper = createColumnHelper<RowObj>();
-  const { tableData } = props;
 
   const [sorting, setSorting] = useState<SortingState>([]);
 
@@ -76,18 +78,40 @@ const EndpointTable = (props: { tableData: any }) => {
         </p>
       ),
     }),
-    columnHelper.accessor("risk", {
+    columnHelper.accessor("date", {
+      id: "date",
+      header: () => (
+        <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
+          DATE
+        </p>
+      ),
+      cell: (info) => (
+        <p className="text-sm font-bold text-navy-700 dark:text-white">
+          {info.getValue()}
+        </p>
+      ),
+    }),
+    columnHelper.accessor("tests_performed", {
       id: "risk",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
-          RISK
+          TESTS PERFORMED
         </p>
       ),
       cell: (info) => {
         return <p>{info.getValue()}</p>;
       },
     }),
-    columnHelper.accessor("passed", {
+    columnHelper.accessor("tests_passed", {
+      id: "tests passed",
+      header: () => (
+        <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
+          PASSED
+        </p>
+      ),
+      cell: (info) => <p className={`text-sm font-bold `}>{info.getValue()}</p>,
+    }),
+    columnHelper.accessor("status", {
       id: "status",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
@@ -102,13 +126,33 @@ const EndpointTable = (props: { tableData: any }) => {
               : "text-red-500 dark:text-red-300"
           }`}
         >
-          {info.getValue() ? "Passed" : "Failed"}
+          {info.getValue() ? "Success" : "Failed"}
         </p>
       ),
     }),
   ]; // eslint-disable-next-line
 
-  const [data, _] = useState(() => [...tableData]);
+  const [data, _] = useState([]);
+
+  useEffect(() => {
+    getTests().then((res) => {
+      if (res.success) {
+        const data = res.data;
+        const rows: RowObj[] = data.map((row) => {
+          return {
+            method: row.endpoint.method,
+            endpoint: row.endpoint.path,
+            date: row.createdAt.split("T")[0],
+            tests_performed: row.testsPerformed,
+            tests_passed: row.testsPassed,
+            status: row.testsPassed === row.testsPerformed,
+          };
+        });
+        _(rows);
+      }
+    });
+  }, []);
+
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const table = useReactTable({
     data,
@@ -134,7 +178,7 @@ const EndpointTable = (props: { tableData: any }) => {
       <Card extra={"w-full h-full sm:overflow-auto px-6"}>
         <header className="relative flex items-center justify-between pt-4">
           <div className="text-xl font-bold text-navy-700 dark:text-white">
-            Test Cases
+            Test Results
           </div>
           <div className="flex items-center justify-between">
             <div className="flex h-full min-h-[32px] items-center rounded-lg bg-lightPrimary text-navy-700 dark:bg-navy-900 dark:text-white xl:w-[225px]">
