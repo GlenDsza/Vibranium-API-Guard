@@ -45,7 +45,7 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({ open, hide }) => {
     >
       <div className="flex items-center justify-between mb-8">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-          Endpoint Details
+          Block Ip Addresses
         </div>
         <button
           onClick={hide}

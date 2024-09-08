@@ -14,6 +14,7 @@ import Card from "@/components/card";
 import { FiSearch } from "react-icons/fi";
 import Pagination from "@/components/pagination/Pagination";
 import { getTests } from "@/apis/tests";
+import { TestObject } from "@/apis/tests";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -37,11 +38,15 @@ type RowObj = {
   endpoint: string;
   date: string;
   tests_performed: number;
-  tests_passed: number;
   status: boolean;
+  actions: TestObject;
 };
 
-const EndpointTable = () => {
+const EndpointTable = ({
+  openDrawer,
+}: {
+  openDrawer: (singleTest: TestObject) => void;
+}) => {
   const columnHelper = createColumnHelper<RowObj>();
 
   const [sorting, setSorting] = useState<SortingState>([]);
@@ -102,15 +107,6 @@ const EndpointTable = () => {
         return <p>{info.getValue()}</p>;
       },
     }),
-    columnHelper.accessor("tests_passed", {
-      id: "tests passed",
-      header: () => (
-        <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
-          PASSED
-        </p>
-      ),
-      cell: (info) => <p className={`text-sm font-bold `}>{info.getValue()}</p>,
-    }),
     columnHelper.accessor("status", {
       id: "status",
       header: () => (
@@ -130,6 +126,24 @@ const EndpointTable = () => {
         </p>
       ),
     }),
+    columnHelper.accessor("actions", {
+      id: "actions",
+      header: () => (
+        <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
+          ACTIONS
+        </p>
+      ),
+      cell: (info) => (
+        <div className="flex items-center justify-start">
+          <button
+            className="text-sm font-bold text-brand-700 bg-gray-200 rounded-md px-2 py-1"
+            onClick={() => openDrawer(info.getValue())}
+          >
+            View
+          </button>
+        </div>
+      ),
+    }),
   ]; // eslint-disable-next-line
 
   const [data, _] = useState([]);
@@ -138,14 +152,20 @@ const EndpointTable = () => {
     getTests().then((res) => {
       if (res.success) {
         const data = res.data;
+
+        data.sort((a, b) => {
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        });
         const rows: RowObj[] = data.map((row) => {
           return {
             method: row.endpoint.method,
             endpoint: row.endpoint.path,
             date: row.createdAt.split("T")[0],
-            tests_performed: row.testsPerformed,
-            tests_passed: row.testsPassed,
-            status: row.testsPassed === row.testsPerformed,
+            tests_performed: row.testsPerformed.length,
+            status: row.testsPerformed.every((test) => test.testSuccess),
+            actions: row,
           };
         });
         _(rows);
