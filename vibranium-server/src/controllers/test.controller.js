@@ -15,10 +15,7 @@ export const testEndpoint = async (req, res) => {
   const { id } = req.params;
   const { organization, secure } = req.body;
 
-  const testCounter = {
-    tests_performed: 0,
-    tests_passed: 0,
-  };
+  const testsPerformed = [];
 
   try {
     const endpoint = await Endpoint.findById(id);
@@ -89,10 +86,10 @@ export const testEndpoint = async (req, res) => {
         payload
       );
 
-      testCounter.tests_performed += 1;
-      if (BrokenAuthRes.success) {
-        testCounter.tests_passed += 1;
-      }
+      testsPerformed.push({
+        testName: "Broken Authentication",
+        testSuccess: BrokenAuthRes.success,
+      });
     }
 
     const token = organizationFound.testingCredentials.token;
@@ -106,10 +103,10 @@ export const testEndpoint = async (req, res) => {
       payload
     );
 
-    if (passwordRes.success) {
-      testCounter.tests_passed += 1;
-    }
-    testCounter.tests_performed += 1;
+    testsPerformed.push({
+      testName: "Excessive Data Exposure",
+      testSuccess: passwordRes.success,
+    });
 
     const user_id = organizationFound.testingCredentials.userId;
     // Test for BOLA
@@ -121,10 +118,10 @@ export const testEndpoint = async (req, res) => {
         user_id,
         id
       );
-      if (BolaRes.success) {
-        testCounter.tests_passed += 1;
-      }
-      testCounter.tests_performed += 1;
+      testsPerformed.push({
+        testName: "Broken Object Level Authorization",
+        testSuccess: BolaRes.success,
+      });
     }
 
     // Test for security headers
@@ -136,10 +133,10 @@ export const testEndpoint = async (req, res) => {
       endpoint.method,
       payload
     );
-    if (securityHeadersRes.success) {
-      testCounter.tests_passed += 1;
-    }
-    testCounter.tests_performed += 1;
+    testsPerformed.push({
+      testName: "Security Headers",
+      testSuccess: securityHeadersRes.success,
+    });
 
     if (endpoint.method.toUpperCase() == "POST" && payload) {
       // Test for parameter limits
@@ -150,16 +147,15 @@ export const testEndpoint = async (req, res) => {
         id,
         payload
       );
-      if (paramLimitsRes.success) {
-        testCounter.tests_passed += 1;
-      }
-      testCounter.tests_performed += 1;
+      testsPerformed.push({
+        testName: "Parameter Limits",
+        testSuccess: paramLimitsRes.success,
+      });
     }
 
     await Test.create({
       endpoint: id,
-      testsPerformed: testCounter.tests_performed,
-      testsPassed: testCounter.tests_passed,
+      testsPerformed: testsPerformed,
     });
 
     return res.status(200).json({ message: "Tests completed successfully" });

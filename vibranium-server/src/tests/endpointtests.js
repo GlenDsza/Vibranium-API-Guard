@@ -398,7 +398,7 @@ export async function testSecurityHeaders(
         recommendations: "Add required security headers",
         status: "Pending",
       });
-      return { success: false, message: "Missing headers:", missingHeaders };
+      return { success: false, message: "Missing headers:" };
     }
   } catch (error) {
     console.log(payload);
@@ -455,6 +455,11 @@ export async function testParamLimits(
         status: "Pending",
       });
       return { success: false, message: "Parameter limit vulnerability found" };
+    } else {
+      return {
+        success: true,
+        message: "Parameter limit vulnerability not found",
+      };
     }
   } catch (error) {
     if (error.response && error.response.status === 422) {

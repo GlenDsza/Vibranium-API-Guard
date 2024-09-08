@@ -1,21 +1,27 @@
 import mongoose from "mongoose";
 
 const testSchema = new mongoose.Schema(
-  {
-    endpoint: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Endpoint",
-      required: true,
+  [
+    {
+      endpoint: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Endpoint",
+        required: true,
+      },
+      testsPerformed: [
+        {
+          testName: {
+            type: String,
+            required: true,
+          },
+          testSuccess: {
+            type: Boolean,
+            required: true,
+          },
+        },
+      ],
     },
-    testsPerformed: {
-      type: Number,
-      required: true,
-    },
-    testsPassed: {
-      type: Number,
-      required: true,
-    },
-  },
+  ],
   {
     timestamps: true,
   }
