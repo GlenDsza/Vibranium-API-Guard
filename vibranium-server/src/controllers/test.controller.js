@@ -6,6 +6,8 @@ import {
   testBOLA,
   testBrokenAuth,
   testPasswordLeak,
+  testParamLimits,
+  testSecurityHeaders,
 } from "../tests/endpointtests.js";
 import { FASTAPI_URL } from "../config.js";
 
@@ -120,6 +122,35 @@ export const testEndpoint = async (req, res) => {
         id
       );
       if (BolaRes.success) {
+        testCounter.tests_passed += 1;
+      }
+      testCounter.tests_performed += 1;
+    }
+
+    // Test for security headers
+    const securityHeadersRes = await testSecurityHeaders(
+      FASTAPI_URL,
+      endpoint_path + param,
+      token,
+      id,
+      endpoint.method,
+      payload
+    );
+    if (securityHeadersRes.success) {
+      testCounter.tests_passed += 1;
+    }
+    testCounter.tests_performed += 1;
+
+    if (endpoint.method.toUpperCase() == "POST" && payload) {
+      // Test for parameter limits
+      const paramLimitsRes = await testParamLimits(
+        FASTAPI_URL,
+        endpoint_path + param,
+        token,
+        id,
+        payload
+      );
+      if (paramLimitsRes.success) {
         testCounter.tests_passed += 1;
       }
       testCounter.tests_performed += 1;

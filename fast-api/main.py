@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Body, Path
+from fastapi import FastAPI, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -126,16 +126,28 @@ def get_current_user(token: str = Depends(oauth2_scheme), db=Depends(get_db)):
     return user
 
 
+def set_headers(response: Response):
+    response.headers["Content-Security-Policy"] = "default-src 'self'"
+    response.headers["Strict-Transport-Security"] = (
+        "max-age=31536000; includeSubDomains"
+    )
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "no-referrer-when-downgrade"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+
+
 # FastAPI models
 class SignupRequest(BaseModel):
-    username: str
-    email: str
-    password: str
+    username: constr(max_length=50)  # type: ignore
+    email: constr(max_length=50)  # type: ignore
+    password: constr(max_length=50)  # type: ignore
 
 
 class ProductCreate(BaseModel):
-    name: str
-    description: Optional[str]
+    name: constr(max_length=50)  # type: ignore
+    description: Optional[constr(max_length=50)]  # type: ignore
     price: float
     stock: int
 
@@ -217,7 +229,8 @@ async def get_product(product_id: int, db=Depends(get_db)):
 
 # Cart Endpoints
 @app.get("/cart/{uid}", response_model=List[CartItemCreate])
-async def get_cart(uid: int, db=Depends(get_db)):
+async def get_cart(uid: int, response: Response, db=Depends(get_db)):
+    set_headers(response)
     return db.query(CartItem).filter(CartItem.user_id == uid).all()
 
 
