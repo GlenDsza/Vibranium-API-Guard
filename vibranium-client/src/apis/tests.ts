@@ -1,14 +1,19 @@
 import axios from "axios";
 
-interface TestObject {
+export interface TestsPerformed {
+  _id: string;
+  testName: string;
+  testSuccess: boolean;
+}
+
+export interface TestObject {
   _id: string;
   endpoint: {
     _id: string;
     method: string;
     path: string;
   };
-  testsPerformed: number;
-  testsPassed: number;
+  testsPerformed: Array<TestsPerformed>;
   createdAt: string;
   updatedAt: string;
   __v: number;

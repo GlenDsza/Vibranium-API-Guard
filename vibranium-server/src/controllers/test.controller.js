@@ -134,7 +134,7 @@ export const testEndpoint = async (req, res) => {
       payload
     );
     testsPerformed.push({
-      testName: "Security Headers",
+      testName: "Security Misconfiguration",
       testSuccess: securityHeadersRes.success,
     });
 
@@ -148,7 +148,7 @@ export const testEndpoint = async (req, res) => {
         payload
       );
       testsPerformed.push({
-        testName: "Parameter Limits",
+        testName: "Unrestricted Resource Consumption",
         testSuccess: paramLimitsRes.success,
       });
     }
