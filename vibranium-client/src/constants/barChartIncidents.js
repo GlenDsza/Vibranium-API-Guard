@@ -1,22 +1,22 @@
 export const barChartDataWeeklyIncidents = [
   {
-    name: "NO_AUTH",
-    data: [7, 5, 9, 8, 4, 3, 6],
+    name: "XSS",
+    data: [1, 5, 9, 8, 4, 3, 6],
     color: "#6AD2Fa",
   },
   {
-    name: "MHH",
-    data: [4, 6, 11, 2, 3, 8, 5],
+    name: "SQL INJECTION",
+    data: [1, 6, 11, 2, 3, 8, 5],
     color: "#4318FF",
   },
   {
-    name: "BOLA",
-    data: [6, 8, 2, 5, 9, 7, 4],
+    name: "UNSAFE_API_CONSUMPTION",
+    data: [1, 8, 2, 5, 9, 7, 4],
     color: "#050C9C",
   },
   {
-    name: "RL",
-    data: [3, 7, 5, 4, 6, 9, 2],
+    name: "DESERIALIZATION",
+    data: [1, 7, 5, 4, 6, 9, 2],
     color: "#A8A8A8",
   },
 ];

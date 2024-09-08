@@ -17,12 +17,12 @@ const Dashboard = () => {
         <Widget
           icon={<FaTasks className="h-6 w-6" />}
           title={"Total APIs"}
-          subtitle={"23"}
+          subtitle={"12"}
         />
         <Widget
           icon={<MdReport className="h-7 w-7" />}
           title={"Critical Endpoints"}
-          subtitle={"4"}
+          subtitle={"2"}
         />
         <Widget
           icon={<VscDebugCoverage className="h-7 w-7" />}
