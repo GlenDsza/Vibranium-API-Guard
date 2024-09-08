@@ -19,7 +19,7 @@ export interface Endpoint {
   summary: string;
   operationId: string;
   enabled: boolean;
-  organization: string;
+  organization: any;
   parameters: Parameter[];
   requestBody: {
     content: {
@@ -75,6 +75,23 @@ export const fetchEndpoints = createAsyncThunk(
   }
 );
 
+export const updateEndpoint = createAsyncThunk(
+  "endpoint/update",
+  async (payload: { endpointId: string; data: any }, _thunkAPI) => {
+    try {
+      const { endpointId, data } = payload;
+      const res = await axios.put(
+        `${import.meta.env.VITE_BACKEND_URL}/api/endpoints/${endpointId}`,
+        data
+      );
+      return res.data;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+);
+
 export const EndpointSlice = createSlice({
   name: "endpoints",
   initialState,
@@ -99,6 +116,18 @@ export const EndpointSlice = createSlice({
       state.error = null;
     });
     builder.addCase(fetchEndpoints.rejected, (state, action) => {
+      state.error = action.error.message || "An error occurred";
+      state.loading = false;
+    });
+    builder.addCase(updateEndpoint.pending, (state) => {
+      state.loading = true;
+      state.error = null;
+    });
+    builder.addCase(updateEndpoint.fulfilled, (state, _action) => {
+      state.loading = false;
+      state.error = null;
+    });
+    builder.addCase(updateEndpoint.rejected, (state, action) => {
       state.error = action.error.message || "An error occurred";
       state.loading = false;
     });

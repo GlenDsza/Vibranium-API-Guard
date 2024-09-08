@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   createColumnHelper,
   FilterFn,
@@ -14,11 +14,9 @@ import Card from "@/components/card";
 import { FiSearch } from "react-icons/fi";
 import Pagination from "@/components/pagination/Pagination";
 import ApiDetailDrawer from "./ApiDetailDrawer";
-import { Parameter } from "@/app/features/EndpointSlice";
+import { Endpoint, Parameter } from "@/app/features/EndpointSlice";
 import { Schema, Threat } from "@/utils/interfaces";
 import { FaInfo } from "react-icons/fa";
-import { enableEndpointApi } from "@/apis/endpoints";
-import { toast } from "react-toastify";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -68,12 +66,23 @@ type RowObj = {
   threats: Threat[];
   createdAt: string;
   updatedAt: string;
-  actions: string | undefined;
+  actions?: string | undefined;
 };
 
-const EndpointTable = (props: { tableData: any, onOpen: any }) => {
+interface EndpointTableProps {
+  tableData: Endpoint[];
+  onProgressOpen: () => void;
+  onProgressClose: () => void;
+  updateEndpoint: (id: string, enabled: boolean) => Promise<void>;
+}
+
+const EndpointTable: FC<EndpointTableProps> = ({
+  tableData,
+  onProgressOpen,
+  onProgressClose,
+  updateEndpoint,
+}) => {
   const columnHelper = createColumnHelper<RowObj>();
-  const { tableData } = props;
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [showDrawer, setShowDrawer] = useState<boolean>(false);
@@ -82,26 +91,6 @@ const EndpointTable = (props: { tableData: any, onOpen: any }) => {
   const handleView = (rowObj: RowObj) => {
     setSelectedRow(rowObj);
     setShowDrawer(true);
-  };
-
-  const enableEndpoint = (id: string, row: RowObj, enable: boolean = true) => {
-    const modified_row = {
-      ...row,
-      enabled: enable,
-    };
-    enableEndpointApi(id, modified_row).then((res) => {
-      if (res.success) {
-        const updatedData = tableData.map((item: RowObj) => {
-          if (item._id === id) {
-            return modified_row;
-          }
-          return item;
-        });
-        _(updatedData);
-        const toastmessage = enable ? "Enabled" : "Disabled";
-        toast.success("Endpoint " + toastmessage + " Successfully");
-      }
-    });
   };
 
   const columns = [
@@ -210,11 +199,7 @@ const EndpointTable = (props: { tableData: any, onOpen: any }) => {
             className={` flex items-center justify-center rounded-lg bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
             onClick={() =>
-              enableEndpoint(
-                info.row.original._id,
-                info.row.original,
-                !info.getValue()
-              )
+              updateEndpoint(info.row.original._id, !info.getValue())
             }
           >
             {info.getValue() ? "Disable" : "Enable"}
@@ -231,7 +216,7 @@ const EndpointTable = (props: { tableData: any, onOpen: any }) => {
     }),
   ]; // eslint-disable-next-line
 
-  const [data, _] = useState(() => [...tableData]);
+  const [data, setData] = useState<Endpoint[]>([]);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const table = useReactTable({
     data,
@@ -251,6 +236,10 @@ const EndpointTable = (props: { tableData: any, onOpen: any }) => {
     getSortedRowModel: getSortedRowModel(),
     debugTable: true,
   });
+
+  useEffect(() => {
+    setData(tableData);
+  }, [tableData]);
 
   return (
     <>
@@ -334,7 +323,8 @@ const EndpointTable = (props: { tableData: any, onOpen: any }) => {
           endpoint={selectedRow}
           open={showDrawer}
           hide={() => setShowDrawer(false)}
-          onOpen={props.onOpen}
+          onProgressOpen={onProgressOpen}
+          onProgressClose={onProgressClose}
         />
       )}
     </>

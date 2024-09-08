@@ -5,7 +5,6 @@ import { FaPlay, FaRegClock } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
 import { BsExclamationCircle } from "react-icons/bs";
 import { IoCopyOutline } from "react-icons/io5";
-import { LuGlobe } from "react-icons/lu";
 import { IoIosInformationCircleOutline } from "react-icons/io";
 import { MdOutlineUpdate } from "react-icons/md";
 import { TbFileDescription } from "react-icons/tb";
@@ -17,21 +16,23 @@ import {
   AccordionBody,
 } from "@material-tailwind/react";
 import { Endpoint } from "@/app/features/EndpointSlice";
-import { Collection, Property } from "@/utils/interfaces";
+import { Collection } from "@/utils/interfaces";
 import axios from "axios";
-import { request } from "http";
 
 interface ApiDetailDrawerProps {
   open: boolean;
   hide: () => void;
   endpoint: Endpoint;
+  onProgressOpen: () => void;
+  onProgressClose: () => void;
 }
 
 const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
   open,
   hide,
   endpoint,
-  onOpen
+  onProgressOpen,
+  onProgressClose,
 }) => {
   const {
     _id,
@@ -73,11 +74,17 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
     }
   }, [responses]);
 
-
-  const closeDrawer = () => {
+  const runTests = async (): Promise<void> => {
     hide();
-    onOpen();
-  }
+    onProgressOpen();
+    const res = await axios.post(
+      `${import.meta.env.VITE_BACKEND_URL}/api/test/${_id}`,
+      {
+        organization: organization._id,
+      }
+    );
+    console.log(res.data);
+  };
 
   const computeRisk = () => {
     let temp = threats.reduce((acc, threat) => {
@@ -167,7 +174,7 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
           </div>
           <div className="col-span-1">
             <button
-              onClick={() => {closeDrawer()}}
+              onClick={runTests}
               className={` flex items-center justify-center rounded-lg bg-brand-50 p-3  font-medium text-brand-500 transition duration-200
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
             >
