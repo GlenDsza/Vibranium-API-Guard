@@ -196,8 +196,18 @@ export const testEndpoint = async (req, res) => {
 };
 
 export const getTests = async (req, res) => {
+  const { endpoint } = req.query;
+  let wherePayload = {};
+
+  if (endpoint) {
+    wherePayload = { ...wherePayload, endpoint };
+  }
+
   try {
-    const tests = await Test.find().populate("endpoint", "path method");
+    const tests = await Test.find(wherePayload).populate(
+      "endpoint",
+      "path method"
+    );
     return res.status(200).json({ tests });
   } catch (error) {
     console.error(error);

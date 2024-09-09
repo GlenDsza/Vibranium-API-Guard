@@ -541,7 +541,66 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
               <p>two!</p>
             </TabPanel>
             <TabPanel>
-              <p>three!</p>
+              {threats.length < 1 ? (
+                <p className="text-gray-600 dark:text-white">
+                  No threats detected
+                </p>
+              ) : (
+                <>
+                  {threats.map((threat) => (
+                    <Accordion
+                      open={accOpen === 1}
+                      icon={<NewIcon id={1} open={accOpen} />}
+                      placeholder={true}
+                      onPointerEnterCapture={undefined}
+                      onPointerLeaveCapture={undefined}
+                    >
+                      <AccordionHeader
+                        onClick={() => handleOpen(1)}
+                        placeholder={true}
+                        onPointerEnterCapture={undefined}
+                        onPointerLeaveCapture={undefined}
+                      >
+                        <p className="font-bold ms-3 text-sm">{threat.name}</p>
+                      </AccordionHeader>
+                      <AccordionBody>
+                        <div className="bg-gray-100 dark:bg-navy-700 dark:text-white p-3 rounded-lg ms-3 mt-[-1rem]">
+                          <div className="grid grid-cols-3">
+                            <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                              name
+                            </div>
+                            <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                              {threat.name}
+                            </div>
+                          </div>
+
+                          <hr className="my-3 bg-gray-300 h-[0.1rem]" />
+
+                          <div className="grid grid-cols-3">
+                            <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                              severity
+                            </div>
+                            <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                              {threat.severity}
+                            </div>
+                          </div>
+
+                          <hr className="my-3 bg-gray-300 h-[0.1rem]" />
+
+                          <div className="grid grid-cols-3">
+                            <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                              description
+                            </div>
+                            <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                              {threat.description}
+                            </div>
+                          </div>
+                        </div>
+                      </AccordionBody>
+                    </Accordion>
+                  ))}
+                </>
+              )}
             </TabPanel>
           </TabPanels>
         </Tabs>
