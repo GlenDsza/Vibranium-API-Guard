@@ -5,16 +5,19 @@ import BarChart from "@/components/charts/BarChart";
 import { barChartOptionsDailyTraffic } from "@/variables/charts";
 
 interface ApisByRiskScoreProps {
+  none_detected_threats: number;
   high_severity_threats: number;
   medium_severity_threats: number;
   low_severity_threats: number;
 }
 
 const ApisByRiskScore: FC<ApisByRiskScoreProps> = ({
+  none_detected_threats,
   high_severity_threats,
   medium_severity_threats,
   low_severity_threats,
 }: {
+  none_detected_threats: number;
   high_severity_threats: number;
   medium_severity_threats: number;
   low_severity_threats: number;
@@ -28,6 +31,7 @@ const ApisByRiskScore: FC<ApisByRiskScoreProps> = ({
     {
       name: "Threats",
       data: [
+        none_detected_threats,
         high_severity_threats,
         medium_severity_threats,
         low_severity_threats,
