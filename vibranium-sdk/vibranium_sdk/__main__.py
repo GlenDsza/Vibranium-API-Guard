@@ -13,8 +13,8 @@ def main():
     subparsers = parser.add_subparsers(dest="command", help="Available commands")
 
     # Subcommand for `run`
-    run_parser = subparsers.add_parser("run", help="Run tests on FastAPI app")
-    run_parser.add_argument("base_url", type=str, help="The base URL of the FastAPI app (e.g., https://your-fastapi-app.com)")
+    # run_parser = subparsers.add_parser("run", help="Run tests on FastAPI app")
+    # run_parser.add_argument("base_url", type=str, help="The base URL of the FastAPI app (e.g., https://your-fastapi-app.com)")
 
     # Subcommand for `lint`
     lint_parser = subparsers.add_parser("lint", help="Lint the OpenAPI specification")

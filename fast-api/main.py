@@ -24,7 +24,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = 30
 
 # Password hashing
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 
 # Define SQLAlchemy models
@@ -140,14 +140,14 @@ def set_headers(response: Response):
 
 # FastAPI models
 class SignupRequest(BaseModel):
-    username: constr(max_length=50)  # type: ignore
-    email: constr(max_length=50)  # type: ignore
-    password: constr(max_length=50)  # type: ignore
+    username: str  # type: ignore
+    email: str  # type: ignore
+    password: str  # type: ignore
 
 
 class ProductCreate(BaseModel):
-    name: constr(max_length=50)  # type: ignore
-    description: Optional[constr(max_length=50)]  # type: ignore
+    name: str  # type: ignore
+    description: Optional[str]  # type: ignore
     price: float
     stock: int
 
@@ -174,15 +174,39 @@ class UserResponse(BaseModel):
 
 
 # FastAPI app
-app = FastAPI()
+app = FastAPI(
+    title="E-commerce API",
+    description="This is a simple e-commerce API built with FastAPI",
+    version="0.1.0",
+    openapi_tags=[
+        {
+            "name": "Authentication",
+            "description": "Operations related to user authentication",
+        },
+        {"name": "Products", "description": "Operations related to products"},
+        {"name": "Cart", "description": "Operations related to the shopping cart"},
+        {"name": "Orders", "description": "Operations related to orders"},
+        {"name": "Users", "description": "Operations related to user management"},
+    ],
+    docs_url="/",
+    redoc_url=None,
+    servers=[{"url": "https://vibranium-api-guard.onrender.com/"}],
+    contact={
+        "name": "E-commerce API Support",
+        "url": "http://localhost:8000",
+        "email": "example@gmail.com",
+    },
+    swagger_ui_oauth2_redirect_url="/auth/login",
+)
 
 
 # Authentication Endpoints
 @app.post(
-    "/auth/signup", 
-    response_description="User registered successfully", 
-    description="This is register API",
-    status_code=201
+    "/auth/signup",
+    response_description="User registered successfully",
+    description="This is register APIs",
+    status_code=201,
+    tags=["Authentication"],
 )
 async def signup(request: SignupRequest, db=Depends(get_db)):
     user = db.query(User).filter(User.email == request.email).first()
@@ -199,7 +223,12 @@ async def signup(request: SignupRequest, db=Depends(get_db)):
     return {"message": "User registered successfully"}
 
 
-@app.post("/auth/login")
+@app.post(
+    "/auth/login",
+    response_description="User logged in successfully",
+    description="This is login API",
+    tags=["Authentication"],
+)
 async def login(form_data: OAuth2PasswordRequestForm = Depends(), db=Depends(get_db)):
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
@@ -213,7 +242,13 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db=Depends(get
 
 
 # Product Endpoints
-@app.post("/products", response_model=ProductCreate)
+@app.post(
+    "/products",
+    response_description="Product created successfully",
+    status_code=201,
+    description="This is create product API",
+    response_model=ProductCreate,
+)
 async def create_product(
     response: Response, product: ProductCreate, db=Depends(get_db)
 ):
@@ -225,13 +260,22 @@ async def create_product(
     return new_product
 
 
-@app.get("/products", response_model=List[ProductCreate])
+@app.get(
+    "/products",
+    tags=["Products"],
+    response_model=List[ProductCreate],
+)
 async def get_products(response: Response, db=Depends(get_db)):
     set_headers(response)
     return db.query(Product).all()
 
 
-@app.get("/products/{product_id}", response_model=ProductCreate)
+@app.get(
+    "/products/{product_id}",
+    description="This is get product by id API",
+    tags=["Products"],
+    response_model=ProductCreate,
+)
 async def get_product(response: Response, product_id: int, db=Depends(get_db)):
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
@@ -241,13 +285,24 @@ async def get_product(response: Response, product_id: int, db=Depends(get_db)):
 
 
 # Cart Endpoints
-@app.get("/cart/{uid}", response_model=List[CartItemCreate])
+@app.get(
+    "/cart/{uid}",
+    description="This is get cart API",
+    tags=["Cart"],
+    response_model=List[CartItemCreate],
+)
 async def get_cart(uid: int, response: Response, db=Depends(get_db)):
     set_headers(response)
     return db.query(CartItem).filter(CartItem.user_id == uid).all()
 
 
-@app.post("/cart", response_description="Item added to cart", status_code=201)
+@app.post(
+    "/cart",
+    description="This is add to cart API",
+    tags=["Cart"],
+    response_description="Item added to cart",
+    status_code=201,
+)
 async def add_to_cart(
     item: CartItemCreate,
     current_user: User = Depends(get_current_user),
@@ -261,7 +316,12 @@ async def add_to_cart(
 
 
 # Order Endpoints
-@app.get("/orders", response_model=List[OrderSend])
+@app.get(
+    "/orders",
+    description="This is get all orders API",
+    tags=["Orders"],
+    response_model=List[OrderSend],
+)
 async def get_orders(
     current_user: User = Depends(get_current_user), db=Depends(get_db)
 ):
@@ -272,6 +332,8 @@ async def get_orders(
     "/orders",
     response_model=OrderCreate,
     response_description="Order placed successfully",
+    description="This is place order API",
+    tags=["Orders"],
 )
 async def place_order(
     order: OrderCreate,
@@ -290,7 +352,7 @@ async def place_order(
     return new_order
 
 
-@app.get("/users/me", response_model=UserResponse)
+@app.get("/users/me", tags=["Users"], response_model=UserResponse)
 def read_user_me(current_user: User = Depends(get_current_user)):
     """
     Fetch the authenticated user's details.
