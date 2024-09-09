@@ -148,15 +148,17 @@ const EndpointTable = ({
         </p>
       ),
       cell: (info) => (
-        <p
-          className={`text-sm font-bold ${
-            info.getValue()
-              ? "text-green-500 dark:text-green-300"
-              : "text-red-500 dark:text-red-300"
-          }`}
-        >
-          {info.getValue() ? "Success" : "Failed"}
-        </p>
+        <div>
+          <span
+            className={`text-sm font-bold px-2 rounded ${
+              info.getValue()
+                ? "text-green-600 bg-green-200"
+                : "text-red-600 bg-red-200"
+            }`}
+          >
+            {info.getValue() ? "Passed" : "Failed"}
+          </span>
+        </div>
       ),
     }),
     columnHelper.accessor("actions", {

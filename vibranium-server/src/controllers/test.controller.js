@@ -182,6 +182,9 @@ export const testEndpoint = async (req, res) => {
         testSuccess: paramLimitsRes.success,
       });
     }
+    if (testsPerformed.every((test) => test.testSuccess)) {
+      await Threat.deleteMany({ endpoint: id });
+    }
 
     await Test.create({
       endpoint: id,

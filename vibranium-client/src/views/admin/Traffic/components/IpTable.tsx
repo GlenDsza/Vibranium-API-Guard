@@ -11,7 +11,6 @@ import {
 } from "@tanstack/react-table";
 import { MdLockOpen } from "react-icons/md";
 import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
-import Card from "@/components/card";
 import { getBlacklistedIps, maybeBlockIp } from "@/apis/blacklist";
 import { toast } from "react-toastify";
 
@@ -86,7 +85,7 @@ const EndpointTable = ({ tableData }: { tableData: RowObj[] }) => {
         </p>
       ),
       cell: (info: any) => (
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center justify-center space-x-2">
           <button
             onClick={() => {
               unblockIp(info.getValue());
@@ -124,62 +123,57 @@ const EndpointTable = ({ tableData }: { tableData: RowObj[] }) => {
 
   return (
     <>
-      <Card extra={"w-full h-full sm:overflow-auto px-6"}>
-        <div className="mt-2 overflow-x-scroll xl:overflow-x-hidden">
-          <table className="w-full">
-            <thead>
-              {table.getHeaderGroups().map((headerGroup) => (
-                <tr
-                  key={headerGroup.id}
-                  className="!border-px !border-gray-400"
-                >
-                  {headerGroup.headers.map((header) => {
-                    return (
-                      <th
-                        key={header.id}
-                        colSpan={header.colSpan}
-                        onClick={header.column.getToggleSortingHandler()}
-                        className="cursor-pointer border-b-[1px] border-gray-200 pb-2 pr-4 pt-4 text-start"
+      <div className="mt-2 overflow-x-scroll xl:overflow-x-hidden  w-full h-full sm:overflow-auto px-6">
+        <table className="w-full">
+          <thead>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <tr key={headerGroup.id} className="!border-px !border-gray-400">
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <th
+                      key={header.id}
+                      colSpan={header.colSpan}
+                      onClick={header.column.getToggleSortingHandler()}
+                      className="cursor-pointer border-b-[1px] border-gray-200 pb-2 pr-4 pt-4 text-start"
+                    >
+                      <div
+                        className={
+                          header.id == "actions"
+                            ? "items-start text-xs text-gray-600 w-4"
+                            : "text-center items-center text-xs text-gray-600"
+                        }
                       >
-                        <div
-                          className={
-                            header.id == "actions"
-                              ? "items-start text-xs text-gray-600 w-4"
-                              : "text-center items-center text-xs text-gray-600"
-                          }
-                        >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext()
-                          )}
-                        </div>
-                      </th>
+                        {flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
+                      </div>
+                    </th>
+                  );
+                })}
+              </tr>
+            ))}
+          </thead>
+          <tbody>
+            {table.getRowModel().rows.map((row) => {
+              return (
+                <tr key={row.id}>
+                  {row.getVisibleCells().map((cell) => {
+                    return (
+                      <td key={cell.id} className="border-white/0 py-3  pr-4">
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )}
+                      </td>
                     );
                   })}
                 </tr>
-              ))}
-            </thead>
-            <tbody>
-              {table.getRowModel().rows.map((row) => {
-                return (
-                  <tr key={row.id}>
-                    {row.getVisibleCells().map((cell) => {
-                      return (
-                        <td key={cell.id} className="border-white/0 py-3  pr-4">
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      </Card>
+              );
+            })}
+          </tbody>
+        </table>
+      </div>
     </>
   );
 };
