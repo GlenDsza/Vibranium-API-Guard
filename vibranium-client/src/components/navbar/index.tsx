@@ -22,8 +22,16 @@ const notifications: Notification[] = [
   {
     id: "1",
     title: "Threat Detected",
-    description: "Unsafe consumpion of external API @ /products",
+    description: "Broken Authentication @ /cart{uid}",
     type: "incident",
+    station_name: "Lagos",
+    created_at: new Date(),
+  },
+  {
+    id: "1",
+    title: "Threat Detected",
+    description: "Excessive Data Exposure @ /cart{uid}",
+    type: "report",
     station_name: "Lagos",
     created_at: new Date(),
   },
