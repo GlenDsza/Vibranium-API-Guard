@@ -179,7 +179,10 @@ app = FastAPI()
 
 # Authentication Endpoints
 @app.post(
-    "/auth/signup", response_description="User registered successfully", status_code=201
+    "/auth/signup", 
+    response_description="User registered successfully", 
+    description="This is register API",
+    status_code=201
 )
 async def signup(request: SignupRequest, db=Depends(get_db)):
     user = db.query(User).filter(User.email == request.email).first()
