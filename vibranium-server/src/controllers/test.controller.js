@@ -233,15 +233,37 @@ export const getDashboradData = async (req, res) => {
       test.testsPerformed.some((test) => !test.testSuccess)
     ).length;
 
-    const high_severity_threats = await Threat.find({
-      severity: "High",
-    }).countDocuments();
-    const medium_severity_threats = await Threat.find({
-      severity: "Medium",
-    }).countDocuments();
-    const low_severity_threats = await Threat.find({
-      severity: "Low",
-    }).countDocuments();
+    const all_endpoints = await Endpoint.find();
+    const threats_for_enpoints = await Promise.all(
+      all_endpoints.map(async (endpoint) => {
+        const threats = await Threat.find({ endpoint: endpoint._id });
+
+        const threat_level = threats.reduce((acc, threat) => {
+          if (threat.severity === "High") {
+            return "High";
+          } else if (threat.severity === "Medium") {
+            return acc === "High" ? "High" : "Medium";
+          } else {
+            return acc === "High" || acc === "Medium" ? acc : "Low";
+          }
+        }, "None Detected");
+
+        return threat_level;
+      })
+    );
+
+    const high_severity_threats = threats_for_enpoints.filter(
+      (threat) => threat === "High"
+    ).length;
+    const medium_severity_threats = threats_for_enpoints.filter(
+      (threat) => threat === "Medium"
+    ).length;
+    const low_severity_threats = threats_for_enpoints.filter(
+      (threat) => threat === "Low"
+    ).length;
+    const none_detected_threats = threats_for_enpoints.filter(
+      (threat) => threat === "None Detected"
+    ).length;
 
     const threats_by_type = await Threat.aggregate([
       {
@@ -260,6 +282,7 @@ export const getDashboradData = async (req, res) => {
       high_severity_threats,
       medium_severity_threats,
       low_severity_threats,
+      none_detected_threats,
       threast_by_type: threats_by_type,
     });
   } catch (error) {

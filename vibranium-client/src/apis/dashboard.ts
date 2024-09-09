@@ -13,6 +13,7 @@ export interface DashboardData {
   high_severity_threats: number;
   medium_severity_threats: number;
   low_severity_threats: number;
+  none_detected_threats: number;
   threast_by_type: ThreatType[];
 }
 
