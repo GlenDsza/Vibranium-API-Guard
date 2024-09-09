@@ -15,6 +15,10 @@ export function maketoken(length) {
   return result;
 }
 
+export function makeMongoId() {
+  return maketoken(24);
+}
+
 export function checkIsHashed(password) {
   // Regular expressions for different hash types
   const md5Pattern = /^[a-f0-9]{32}$/;

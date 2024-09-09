@@ -161,6 +161,11 @@ class OrderCreate(BaseModel):
     address: str
 
 
+class OrderSend(BaseModel):
+    id: int
+    address: str
+
+
 class UserResponse(BaseModel):
     id: int
     username: str
@@ -253,7 +258,7 @@ async def add_to_cart(
 
 
 # Order Endpoints
-@app.get("/orders", response_model=List[OrderCreate])
+@app.get("/orders", response_model=List[OrderSend])
 async def get_orders(
     current_user: User = Depends(get_current_user), db=Depends(get_db)
 ):

@@ -8,6 +8,8 @@ import {
   testPasswordLeak,
   testParamLimits,
   testSecurityHeaders,
+  testIDOR,
+  testExcessiveIDORExposure,
 } from "../tests/endpointtests.js";
 import { FASTAPI_URL } from "../config.js";
 
@@ -30,6 +32,7 @@ export const testEndpoint = async (req, res) => {
 
     let endpoint_path = endpoint.path;
     let param = "";
+    let param_type = "";
     let use_param = false;
 
     // check if endpoint is of the form /endpoint/{paramname}
@@ -42,7 +45,7 @@ export const testEndpoint = async (req, res) => {
       }
 
       use_param = true;
-      const param_type = endpoint.parameters[0]?.schemaRef?.type;
+      param_type = endpoint.parameters[0]?.schemaRef?.type;
       if (param_type === "string") {
         param = "test";
       } else if (param_type === "number" || param_type === "integer") {
@@ -108,6 +111,19 @@ export const testEndpoint = async (req, res) => {
       testSuccess: passwordRes.success,
     });
 
+    const idorExposureTestRes = await testExcessiveIDORExposure(
+      FASTAPI_URL + endpoint_path + param,
+      token,
+      id,
+      endpoint.method,
+      payload
+    );
+
+    testsPerformed.push({
+      testName: "Internal Data Exposure",
+      testSuccess: idorExposureTestRes.success,
+    });
+
     const user_id = organizationFound.testingCredentials.userId;
     // Test for BOLA
     if (use_param) {
@@ -121,6 +137,19 @@ export const testEndpoint = async (req, res) => {
       testsPerformed.push({
         testName: "Broken Object Level Authorization",
         testSuccess: BolaRes.success,
+      });
+
+      const idorTestRes = await testIDOR(
+        FASTAPI_URL + endpoint_path,
+        token,
+        id,
+        param_type,
+        endpoint.method,
+        payload
+      );
+      testsPerformed.push({
+        testName: "Insecure Direct Object Reference",
+        testSuccess: idorTestRes.success,
       });
     }
 
