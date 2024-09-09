@@ -150,7 +150,7 @@ const EndpointTable = ({
       cell: (info) => (
         <div>
           <span
-            className={`text-sm font-bold px-2 rounded ${
+            className={`text-sm px-2 rounded ${
               info.getValue()
                 ? "text-green-600 bg-green-200"
                 : "text-red-600 bg-red-200"

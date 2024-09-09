@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import Card from "@/components/card";
 import { FiSearch } from "react-icons/fi";
-
+import { FaHourglassHalf } from "react-icons/fa";
 import {
   createColumnHelper,
   FilterFn,
@@ -22,9 +22,9 @@ import {
   compareItems,
 } from "@tanstack/match-sorter-utils";
 import Pagination from "@/components/pagination/Pagination";
-import { BiCircle } from "react-icons/bi";
 import { Endpoint } from "@/app/features/EndpointSlice";
 import { Threat } from "@/utils/interfaces";
+import { FaCheck } from "react-icons/fa";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -83,17 +83,15 @@ function ThreatTable(props: {
       ),
       cell: (info) => (
         <div
-          className={`h-full w-[80px] rounded-md ${
+          className={`h-full w-[80px] rounded-md text-sm font-bold flex justify-center ${
             info.getValue() === "High"
-              ? "bg-red-500 bg-opacity-80"
+              ? "bg-red-200 text-red-600"
               : info.getValue() === "Medium"
-              ? "bg-yellow-500 bg-opacity-80"
-              : "bg-green-500 bg-opacity-80"
+              ? "bg-yellow-200 text-yellow-600"
+              : "bg-green-200 text-green-600"
           }`}
         >
-          <p className="text-sm font-bold text-white flex items-center justify-center">
-            {info.getValue()}
-          </p>
+          {info.getValue()}
         </div>
       ),
     }),
@@ -155,12 +153,12 @@ function ThreatTable(props: {
         <p className="text-sm font-bold text-navy-700 dark:text-white">
           {info.getValue() === "Pending" ? (
             <div className="flex gap-3">
-              <BiCircle size={20} className="text-yellow-500" />
+              <FaHourglassHalf size={20} className="text-yellow-500" />
               {info.getValue()}
             </div>
           ) : (
             <div className="flex gap-3">
-              <BiCircle size={20} className="text-green-500" />
+              <FaCheck size={20} className="text-green-500" />
               {info.getValue()}
             </div>
           )}

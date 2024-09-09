@@ -1,11 +1,43 @@
+import { getTests } from "@/apis/tests";
+import { useAppSelector } from "@/app/store";
 import Card from "@/components/card";
 import Progress from "@/components/progress";
-import { apisForCoverage } from "@/constants/miscellaneous";
+import { useEffect, useState } from "react";
 import { ImEnlarge } from "react-icons/im";
 import { NavigateFunction, useNavigate } from "react-router-dom";
 
 const TestCoverage = () => {
+  const endpoints = useAppSelector((state) => state.endpoints.data);
+  const [tests, setTests] = useState<any[]>([]);
   const navigate: NavigateFunction = useNavigate();
+
+  useEffect(() => {
+    if (endpoints.length > 0) {
+      getFilteredTests();
+    }
+  }, [endpoints]);
+
+  const getFilteredTests = async (): Promise<void> => {
+    endpoints.forEach((endpoint) => {
+      getTests(endpoint._id).then((res) => {
+        if (res.success) {
+          const rows: any[] = res.data.map((row) => {
+            const { testsPerformed } = row;
+            const testsPassed = testsPerformed.filter(
+              (test: any) => test.testSuccess
+            );
+
+            return {
+              endpointId: row.endpoint._id,
+              totalTests: testsPerformed.length,
+              passedTests: testsPassed.length,
+            };
+          });
+          setTests((prev) => [...prev, ...rows]);
+        }
+      });
+    });
+  };
   return (
     <Card extra={"w-full sm:overflow-auto h-[440px]"}>
       <header className="relative flex items-center justify-between p-6 pb-0">
@@ -25,18 +57,59 @@ const TestCoverage = () => {
       </header>
 
       <div className="mt-4 mb-6 px-6 overflow-y-scroll xl:overflow-x-hidden">
-        {apisForCoverage.map((api, index) => (
-          <div className="flex flex-col" key={index + 1}>
-            <p className="font-dm text-sm font-medium text-gray-600 mb-3">
-              {api.name}
-            </p>
-            <div className="flex gap-3 items-center">
-              <Progress value={api.coverage} />
-              <span className="text-sm text-gray-600">{api.coverage}%</span>
-            </div>
-            <hr className="mt-2 mb-4" />
-          </div>
-        ))}
+        {endpoints.map(
+          (endpoint, index) =>
+            tests.filter((test) => test.endpointId === endpoint._id).length >
+              0 && (
+              <div className="flex flex-col" key={index + 1}>
+                <div className="flex justify-between">
+                  <div className="flex gap-1">
+                    <span className="font-dm text-sm font-medium text-gray-700 mb-3 bg-gray-200 px-2 rounded">
+                      {endpoint.path}
+                    </span>
+                    <span className="font-dm text-sm font-medium text-gray-700">
+                      ({endpoint.method.toUpperCase()})
+                    </span>
+                  </div>
+                  <span className="font-dm text-sm font-medium text-gray-700">
+                    {tests.filter((test) => test.endpointId === endpoint._id)[0]
+                      ?.passedTests || 0}{" "}
+                    /{" "}
+                    {tests.filter((test) => test.endpointId === endpoint._id)[0]
+                      ?.totalTests || 0}{" "}
+                    tests passed
+                  </span>
+                </div>
+
+                <div className="flex gap-3 items-center">
+                  <Progress
+                    value={Math.floor(
+                      ((tests.filter(
+                        (test) => test.endpointId === endpoint._id
+                      )[0]?.passedTests || 0) /
+                        (tests.filter(
+                          (test) => test.endpointId === endpoint._id
+                        )[0]?.totalTests || 1)) *
+                        100
+                    )}
+                  />
+                  <span className="text-sm text-gray-600">
+                    {Math.floor(
+                      ((tests.filter(
+                        (test) => test.endpointId === endpoint._id
+                      )[0]?.passedTests || 0) /
+                        (tests.filter(
+                          (test) => test.endpointId === endpoint._id
+                        )[0]?.totalTests || 1)) *
+                        100
+                    )}
+                    %
+                  </span>
+                </div>
+                <hr className="mt-2 mb-4" />
+              </div>
+            )
+        )}
       </div>
     </Card>
   );

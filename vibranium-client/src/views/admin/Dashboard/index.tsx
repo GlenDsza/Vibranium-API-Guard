@@ -7,6 +7,8 @@ import IssuesPieChart from "./components/IssuesByCategory";
 import ApisByRiskScore from "./components/ApisByRiskScore";
 import { useEffect, useState } from "react";
 import { DashboardData, getDashboardData } from "@/apis/dashboard";
+import WeeklyVisitors from "./components/WeeklyVisitors";
+import TestCoverage from "./components/TestCoverage";
 
 const Dashboard = () => {
   const [data, setData] = useState<DashboardData | null>(null);
@@ -60,15 +62,15 @@ const Dashboard = () => {
         <IssuesPieChart threats_by_type={data.threast_by_type} />
       </div>
 
-      {/* <div className="mt-5 grid grid-cols-5 gap-5">
+      <div className="mt-5 grid grid-cols-5 gap-5">
         <div className="col-span-2: md:col-span-3">
-          <WeeklyIssues />
+          <WeeklyVisitors />
         </div>
 
         <div className="col-span-2 rounded-[20px]">
           <TestCoverage />
         </div>
-      </div> */}
+      </div>
     </div>
   );
 };

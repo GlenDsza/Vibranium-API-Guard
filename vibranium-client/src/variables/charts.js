@@ -219,6 +219,14 @@ export const lineChartDataTotalSpent = [
   },
 ];
 
+export const singleLineChartDataTotalSpent = [
+  {
+    name: "Revenue",
+    data: [20, 0, 0, 0, 49, 68, 39],
+    color: "#4318FF",
+  },
+];
+
 export const lineChartOptionsTotalSpent = {
   legend: {
     show: false,
@@ -254,7 +262,7 @@ export const lineChartOptionsTotalSpent = {
     },
   },
   grid: {
-    show: false,
+    show: true,
   },
   xaxis: {
     axisBorder: {
@@ -272,11 +280,59 @@ export const lineChartOptionsTotalSpent = {
     },
     type: "text",
     range: undefined,
-    categories: ["SEP", "OCT", "NOV", "DEC", "JAN", "FEB"],
+    // Add last 7 days Dates as y labels in format 9 Sept
+    categories: [
+      new Date(new Date().setDate(new Date().getDate() - 6)).toLocaleDateString(
+        "en-US",
+        {
+          day: "2-digit",
+          month: "short",
+        }
+      ),
+      new Date(new Date().setDate(new Date().getDate() - 5)).toLocaleDateString(
+        "en-US",
+        {
+          day: "2-digit",
+          month: "short",
+        }
+      ),
+      new Date(new Date().setDate(new Date().getDate() - 4)).toLocaleDateString(
+        "en-US",
+        {
+          day: "2-digit",
+          month: "short",
+        }
+      ),
+      new Date(new Date().setDate(new Date().getDate() - 3)).toLocaleDateString(
+        "en-US",
+        {
+          day: "2-digit",
+          month: "short",
+        }
+      ),
+      new Date(new Date().setDate(new Date().getDate() - 2)).toLocaleDateString(
+        "en-US",
+        {
+          day: "2-digit",
+          month: "short",
+        }
+      ),
+      new Date(new Date().setDate(new Date().getDate() - 1)).toLocaleDateString(
+        "en-US",
+        {
+          day: "2-digit",
+          month: "short",
+        }
+      ),
+      new Date().toLocaleDateString("en-US", {
+        day: "2-digit",
+        month: "short",
+      }),
+    ],
   },
 
   yaxis: {
-    show: false,
+    show: true,
   },
 };
 
