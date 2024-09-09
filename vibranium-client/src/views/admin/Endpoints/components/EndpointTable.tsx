@@ -131,7 +131,7 @@ const EndpointTable: FC<EndpointTableProps> = ({
         </p>
       ),
     }),
-    columnHelper.accessor("threats", {
+    columnHelper.accessor("_id", {
       id: "risk",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
@@ -139,7 +139,7 @@ const EndpointTable: FC<EndpointTableProps> = ({
         </p>
       ),
       cell: (info) => {
-        const threats = info.getValue() as Threat[];
+        const threats = [...info.row.original.threats];
         const risk = threats.reduce((acc, threat) => {
           if (threat.severity === "High") {
             return "High";

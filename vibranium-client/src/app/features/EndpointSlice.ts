@@ -68,7 +68,21 @@ export const fetchEndpoints = createAsyncThunk(
           import.meta.env.VITE_BACKEND_URL
         }/api/endpoints?organization=${organization}`
       );
-      return res.data;
+      const updatedEndpoints = await Promise.all(
+        res.data.map(async (endpoint: Endpoint) => {
+          const threats = await axios.get(
+            `${import.meta.env.VITE_BACKEND_URL}/api/threats?endpoint=${
+              endpoint._id
+            }`
+          );
+          return {
+            ...endpoint,
+            threats: [...endpoint.threats, ...threats.data],
+          };
+        })
+      );
+
+      return updatedEndpoints;
     } catch (error) {
       console.log(error);
       throw error;
