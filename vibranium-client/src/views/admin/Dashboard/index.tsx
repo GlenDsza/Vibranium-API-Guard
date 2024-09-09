@@ -52,6 +52,7 @@ const Dashboard = () => {
 
       <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-5">
         <ApisByRiskScore
+          none_detected_threats={data.none_detected_threats}
           high_severity_threats={data.high_severity_threats}
           medium_severity_threats={data.medium_severity_threats}
           low_severity_threats={data.low_severity_threats}
