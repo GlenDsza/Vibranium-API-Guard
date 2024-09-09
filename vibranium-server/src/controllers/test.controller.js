@@ -2,6 +2,7 @@ import Endpoint from "../models/endpoint.model.js";
 import Organization from "../models/organization.model.js";
 import Schema from "../models/schema.model.js";
 import Test from "../models/test.model.js";
+import Threat from "../models/threat.model.js";
 import {
   testBOLA,
   testBrokenAuth,
@@ -214,6 +215,53 @@ export const deleteTest = async (req, res) => {
       await Test.findByIdAndDelete(id);
       return res.status(200).json({ message: "Test deleted successfully" });
     }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const getDashboradData = async (req, res) => {
+  try {
+    const endpoint_count = await Endpoint.countDocuments();
+    const threats_count = await Threat.countDocuments();
+    const all_tests = await Test.find();
+    const passed_tests_count = all_tests.filter((test) =>
+      test.testsPerformed.every((test) => test.testSuccess)
+    ).length;
+    const failed_tests_count = all_tests.filter((test) =>
+      test.testsPerformed.some((test) => !test.testSuccess)
+    ).length;
+
+    const high_severity_threats = await Threat.find({
+      severity: "High",
+    }).countDocuments();
+    const medium_severity_threats = await Threat.find({
+      severity: "Medium",
+    }).countDocuments();
+    const low_severity_threats = await Threat.find({
+      severity: "Low",
+    }).countDocuments();
+
+    const threats_by_type = await Threat.aggregate([
+      {
+        $group: {
+          _id: "$type",
+          count: { $sum: 1 },
+        },
+      },
+    ]);
+
+    return res.status(200).json({
+      endpoint_count,
+      threats_count,
+      passed_tests_count,
+      failed_tests_count,
+      high_severity_threats,
+      medium_severity_threats,
+      low_severity_threats,
+      threast_by_type: threats_by_type,
+    });
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });

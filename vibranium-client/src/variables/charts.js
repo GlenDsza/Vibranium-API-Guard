@@ -279,3 +279,11 @@ export const lineChartOptionsTotalSpent = {
     show: false,
   },
 };
+
+export const colorSamples = [
+  "#4318FF",
+  "#6AD2FF",
+  "#A8A8A8",
+  "#050C9C",
+  "#A7E6FF",
+];

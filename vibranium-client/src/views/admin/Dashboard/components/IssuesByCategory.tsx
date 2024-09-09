@@ -1,12 +1,64 @@
 import Card from "@/components/card";
 import PieChart from "@/components/charts/PieChart";
-import { pieChartData, pieChartOptions } from "@/variables/charts";
 import { type FC } from "react";
 import { ImEnlarge } from "react-icons/im";
 import { NavigateFunction, useNavigate } from "react-router-dom";
+import { ThreatType } from "@/apis/dashboard";
 
-const IssuesByCategory: FC = () => {
+interface ThreatsPieChartCategoricalProps {
+  threats_by_type: ThreatType[];
+}
+
+const ThreatsPieChartCategorical: FC<ThreatsPieChartCategoricalProps> = ({
+  threats_by_type,
+}) => {
   const navigate: NavigateFunction = useNavigate();
+
+  const pieChartData = threats_by_type.map((threat) => threat.count);
+  const labels = threats_by_type.map((threat) => threat._id);
+
+  const pieChartOptions = {
+    labels: labels,
+    colors: ["#4318FF", "#6AD2FF", "#A8A8A8", "#050C9C", "#A7E6FF"],
+    chart: {
+      width: "50px",
+    },
+    states: {
+      hover: {
+        filter: {
+          type: "none",
+        },
+      },
+    },
+    legend: {
+      show: true,
+    },
+    dataLabels: {
+      enabled: true,
+    },
+    plotOptions: {
+      donut: {
+        expandOnClick: false,
+        donut: {
+          labels: {
+            show: true,
+          },
+        },
+      },
+    },
+    fill: {
+      colors: ["#4318FF", "#6AD2FF", "#A8A8A8", "#050C9C", "#A7E6FF"],
+    },
+    tooltip: {
+      enabled: true,
+      theme: "dark",
+      style: {
+        fontSize: "12px",
+        backgroundColor: "#000000",
+      },
+    },
+  };
+
   return (
     <Card extra={"w-full h-full sm:overflow-auto px-6 col-span-3"}>
       <header className="relative flex items-center justify-between pt-4">
@@ -35,4 +87,4 @@ const IssuesByCategory: FC = () => {
   );
 };
 
-export default IssuesByCategory;
+export default ThreatsPieChartCategorical;
