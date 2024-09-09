@@ -1,6 +1,6 @@
 import logging
 from time import time
-from flask import Flask, request, Response
+from flask import Flask, json, request, Response
 from pymongo import MongoClient
 from pymongo.server_api import ServerApi
 import requests
@@ -67,8 +67,18 @@ def filter_ip():
 def filter_xss_sql_injection():
     """Sanitize all incoming data to prevent XSS and SQL injection."""
     if request.data:
-        sanitized_data = protector.sanitize_input(request.data.decode("utf-8"))
-        request._cached_data = sanitized_data.encode("utf-8")
+        rdata = request.data.decode("utf-8")
+        rdata = json.loads(rdata)
+        if isinstance(rdata, dict):
+            for k, v in rdata.items():
+                rdata[k] = protector.sanitize_input(v)
+        elif isinstance(rdata, str):
+            rdata = protector.sanitize_input(rdata)
+
+        json_data = json.dumps(rdata)
+        request._cached_data = json_data.encode("utf-8")
+        request.data = json_data.encode("utf-8")
+        print(request.data)
     if request.args:
         sanitized_args = {
             k: protector.sanitize_input(v) for k, v in request.args.items()
@@ -108,6 +118,11 @@ def proxy(url):
         return Response("This endpoint is disabled.", status=403)
 
     try:
+        if request.data:
+            data_to_send = request.data
+        else:
+            data_to_send = request.form
+
         match request.method:
             case "GET":
                 logging.info(f"GET request to {target_url} from IP: {client_ip}")
@@ -121,7 +136,7 @@ def proxy(url):
                 logging.info(f"POST request to {target_url} from IP: {client_ip}")
                 resp = requests.post(
                     target_url,
-                    data=request.form,
+                    data=data_to_send,
                     headers={
                         key: value for key, value in request.headers if key != "Host"
                     },
@@ -130,7 +145,7 @@ def proxy(url):
                 logging.info(f"PUT request to {target_url} from IP: {client_ip}")
                 resp = requests.put(
                     target_url,
-                    data=request.form,
+                    data=data_to_send,
                     headers={
                         key: value for key, value in request.headers if key != "Host"
                     },
