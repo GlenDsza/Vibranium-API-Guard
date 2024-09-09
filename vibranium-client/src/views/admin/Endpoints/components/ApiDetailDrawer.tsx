@@ -18,7 +18,18 @@ import {
 import { Endpoint } from "@/app/features/EndpointSlice";
 import { Collection } from "@/utils/interfaces";
 import axios from "axios";
+import { FiSearch } from "react-icons/fi";
+import { getTests, TestObject } from "@/apis/tests";
 
+interface CustomTestObject {
+  method: string;
+  endpoint: string;
+  date: string;
+  time: string;
+  tests_performed: number;
+  status: boolean;
+  actions: TestObject;
+}
 interface ApiDetailDrawerProps {
   open: boolean;
   hide: () => void;
@@ -51,8 +62,10 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
   } = endpoint;
 
   const [risk, setRisk] = useState<string>("Low");
+  const [globalFilter, setGlobalFilter] = useState<string>("");
   const [accOpen, setAccOpen] = useState<number>(0);
   const [collections, setCollections] = useState<Collection[]>([]);
+  const [tests, setTests] = useState<CustomTestObject[]>([]);
   const opResponse = useRef<Map<string, any>>(null);
   const handleOpen = (value: number) =>
     setAccOpen(accOpen === value ? 0 : value);
@@ -60,11 +73,11 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
   useEffect(() => {
     computeRisk();
     getRelatedCollections(_id);
+    getFilteredTests(_id);
   }, [endpoint]);
 
   useEffect(() => {
     if (responses) {
-      console.log(responses);
       getResponses();
     }
   }, [responses]);
@@ -91,7 +104,7 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
     setRisk(temp);
   };
 
-  const getRelatedCollections = async (id: string) => {
+  const getRelatedCollections = async (id: string): Promise<void> => {
     const res = await axios.get(
       `${import.meta.env.VITE_BACKEND_URL}/api/collections?endpointId=${id}`
     );
@@ -104,6 +117,41 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
       temp.set(key, value);
     }
     opResponse.current = temp;
+  };
+
+  const getFilteredTests = async (endpoint: string): Promise<void> => {
+    getTests(endpoint).then((res) => {
+      if (res.success) {
+        const data = res.data;
+
+        data.sort((a, b) => {
+          return (
+            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
+        });
+        const rows: CustomTestObject[] = data.map((row) => {
+          const { endpoint, createdAt, testsPerformed } = row;
+          let time = createdAt.split("T")[1].split(".")[0];
+          let hours = parseInt(time.split(":")[0]);
+          let minutes = parseInt(time.split(":")[1]);
+          let suffix = hours >= 12 ? "PM" : "AM";
+          hours = hours % 12;
+          hours = hours ? hours : 12;
+          time = hours + ":" + minutes + " " + suffix;
+
+          return {
+            method: endpoint.method,
+            endpoint: endpoint.path,
+            date: createdAt.split("T")[0],
+            time,
+            tests_performed: testsPerformed.length,
+            status: testsPerformed.every((test: any) => test.testSuccess),
+            actions: row,
+          };
+        });
+        setTests(rows);
+      }
+    });
   };
 
   function NewIcon({ id, open }: { id: number; open: number }) {
@@ -307,7 +355,7 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
                   <p className="font-bold ms-3">Params</p>
                 </AccordionHeader>
                 <AccordionBody>
-                  <div className="ms-3">
+                  <div className="ms-3 mt-[-1rem]">
                     {parameters.length < 1 ? (
                       <p>
                         <span className="text-gray-600 dark:text-white">
@@ -538,30 +586,140 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
               </Accordion>
             </TabPanel>
             <TabPanel>
-              <p>two!</p>
-            </TabPanel>
-            <TabPanel>
-              {threats.length < 1 ? (
-                <p className="text-gray-600 dark:text-white">
-                  No threats detected
+              {tests.length < 1 ? (
+                <p className="text-gray-600 dark:text-white ms-3">
+                  No Test Runs found
                 </p>
               ) : (
                 <>
-                  {threats.map((threat) => (
+                  <div className="flex justify-end">
+                    <div className="flex h-full min-h-[32px] items-center rounded-lg bg-lightPrimary text-navy-700 dark:bg-navy-900 dark:text-white xl:w-[225px] mb-2">
+                      <p className="pl-3 pr-2 text-xl">
+                        <FiSearch className="h-4 w-4 text-gray-400 dark:text-white" />
+                      </p>
+                      <input
+                        type="text"
+                        value={globalFilter}
+                        onChange={(e) => setGlobalFilter(e.target.value)}
+                        placeholder="Search..."
+                        className="block h-full min-h-[32px] w-full rounded-full bg-lightPrimary text-sm font-medium text-navy-700 outline-none placeholder:!text-gray-400 dark:bg-navy-900 dark:text-white dark:placeholder:!text-white sm:w-fit"
+                      />
+                    </div>
+                  </div>
+                  {tests.map((test, index) => (
                     <Accordion
-                      open={accOpen === 1}
-                      icon={<NewIcon id={1} open={accOpen} />}
+                      open={accOpen === index + 1}
+                      icon={<NewIcon id={index + 1} open={accOpen} />}
                       placeholder={true}
                       onPointerEnterCapture={undefined}
                       onPointerLeaveCapture={undefined}
                     >
                       <AccordionHeader
-                        onClick={() => handleOpen(1)}
+                        onClick={() => handleOpen(index + 1)}
                         placeholder={true}
                         onPointerEnterCapture={undefined}
                         onPointerLeaveCapture={undefined}
                       >
-                        <p className="font-bold ms-3 text-sm">{threat.name}</p>
+                        <div className="flex gap-3">
+                          <p className="font-semibold ms-3 text-sm">
+                            {test.tests_performed} tests performed on
+                            {" " + test.date} at{" " + test.time}
+                          </p>
+                          <div
+                            className={`flex items-center justify-center text-xs font-semibold rounded-md px-2 ${
+                              test.status
+                                ? "bg-green-200 text-green-600"
+                                : "bg-red-300 text-red-600"
+                            } `}
+                          >
+                            {test.status ? "Passed" : "Failed"}
+                          </div>
+                        </div>
+                      </AccordionHeader>
+                      <AccordionBody>
+                        <div className="ms-3">
+                          {test.actions.testsPerformed.map((testCase) => (
+                            <>
+                              <div className="grid grid-cols-3">
+                                <div className="col-span-2 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                                  {testCase.testName}
+                                </div>
+                                <div className="col-span-1 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                                  {testCase.testSuccess ? (
+                                    <span className="text-green-600 dark:text-green-300">
+                                      Passed
+                                    </span>
+                                  ) : (
+                                    <span className="text-red-600 dark:text-red-300">
+                                      Failed
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+
+                              <hr className="my-3" />
+                            </>
+                          ))}
+                        </div>
+                      </AccordionBody>
+                    </Accordion>
+                  ))}
+                </>
+              )}
+            </TabPanel>
+            <TabPanel>
+              {threats.length < 1 ? (
+                <p className="text-gray-600 dark:text-white ms-3">
+                  No threats detected
+                </p>
+              ) : (
+                <>
+                  <div className="flex justify-end">
+                    <div className="flex h-full min-h-[32px] items-center rounded-lg bg-lightPrimary text-navy-700 dark:bg-navy-900 dark:text-white xl:w-[225px] mb-2">
+                      <p className="pl-3 pr-2 text-xl">
+                        <FiSearch className="h-4 w-4 text-gray-400 dark:text-white" />
+                      </p>
+                      <input
+                        type="text"
+                        value={globalFilter}
+                        onChange={(e) => setGlobalFilter(e.target.value)}
+                        placeholder="Search..."
+                        className="block h-full min-h-[32px] w-full rounded-full bg-lightPrimary text-sm font-medium text-navy-700 outline-none placeholder:!text-gray-400 dark:bg-navy-900 dark:text-white dark:placeholder:!text-white sm:w-fit"
+                      />
+                    </div>
+                  </div>
+                  {threats.map((threat, index) => (
+                    <Accordion
+                      open={accOpen === index + 1}
+                      icon={<NewIcon id={index + 1} open={accOpen} />}
+                      placeholder={true}
+                      onPointerEnterCapture={undefined}
+                      onPointerLeaveCapture={undefined}
+                    >
+                      <AccordionHeader
+                        onClick={() => handleOpen(index + 1)}
+                        placeholder={true}
+                        onPointerEnterCapture={undefined}
+                        onPointerLeaveCapture={undefined}
+                      >
+                        <div className="flex gap-3">
+                          <p className="font-bold ms-3 text-sm">
+                            {threat.name}
+                          </p>
+                          <div
+                            className={`flex items-center justify-center text-xs font-semibold rounded-md px-2 ${
+                              threat.severity === "Low"
+                                ? "bg-yellow-200 text-yellow-600"
+                                : threat.severity === "Medium"
+                                ? "bg-orange-300 text-orange-600"
+                                : "bg-red-300 text-red-600"
+                            } `}
+                          >
+                            {threat.severity}
+
+                            <BsExclamationCircle className="ms-1 h-3 w-3" />
+                          </div>
+                        </div>
                       </AccordionHeader>
                       <AccordionBody>
                         <div className="bg-gray-100 dark:bg-navy-700 dark:text-white p-3 rounded-lg ms-3 mt-[-1rem]">
@@ -593,6 +751,17 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
                             </div>
                             <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
                               {threat.description}
+                            </div>
+                          </div>
+
+                          <hr className="my-3 bg-gray-300 h-[0.1rem]" />
+
+                          <div className="grid grid-cols-3">
+                            <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                              recommendation
+                            </div>
+                            <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                              {threat?.recommendations || "-"}
                             </div>
                           </div>
                         </div>

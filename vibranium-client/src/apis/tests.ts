@@ -13,7 +13,7 @@ export interface TestObject {
     method: string;
     path: string;
   };
-  testsPerformed: Array<TestsPerformed>;
+  testsPerformed: TestsPerformed[];
   createdAt: string;
   updatedAt: string;
   __v: number;
@@ -28,9 +28,18 @@ type TestOutput =
       data: TestObject[];
     };
 
-export async function getTests(): Promise<TestOutput> {
+export async function getTests(
+  endpoint?: string | undefined
+): Promise<TestOutput> {
   try {
-    const res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/test`);
+    let res;
+    if (endpoint) {
+      res = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/test?endpoint=${endpoint}`
+      );
+    } else {
+      res = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/test`);
+    }
     return { success: true, data: res.data.tests };
   } catch (error) {
     console.error(error);
