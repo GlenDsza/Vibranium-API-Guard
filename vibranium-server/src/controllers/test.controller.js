@@ -174,3 +174,19 @@ export const getTests = async (req, res) => {
     return res.status(500).json({ message: "Internal server error" });
   }
 };
+
+export const deleteTest = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const test = await Test.findById(id);
+    if (!test) {
+      return res.status(404).json({ message: "Test not found" });
+    } else {
+      await Test.findByIdAndDelete(id);
+      return res.status(200).json({ message: "Test deleted successfully" });
+    }
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
