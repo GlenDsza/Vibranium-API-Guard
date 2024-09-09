@@ -91,7 +91,6 @@ export default function Admin(props: Record<string, unknown>) {
   const getRoutes = (routes: RoutesType[]): ReactElement[] => {
     return routes.map((prop, key) => {
       if (prop.layout === "/admin") {
-        console.log(prop.path);
         return (
           <Route path={`/${prop.path}`} element={prop.component} key={key} />
         );

@@ -1,9 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Card from "@/components/card";
-import { NavigateFunction, useNavigate } from "react-router-dom";
-import { AiOutlinePlus } from "react-icons/ai";
 import { FiSearch } from "react-icons/fi";
-import avatar from "@/assets/img/defaultAvatar.jpg";
 
 import {
   createColumnHelper,
@@ -25,8 +22,9 @@ import {
   compareItems,
 } from "@tanstack/match-sorter-utils";
 import Pagination from "@/components/pagination/Pagination";
-import { FaUser, FaUserShield } from "react-icons/fa6";
 import { BiCircle } from "react-icons/bi";
+import { Endpoint } from "@/app/features/EndpointSlice";
+import { Threat } from "@/utils/interfaces";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -57,24 +55,23 @@ const fuzzySort: SortingFn<any> = (rowA, rowB, columnId) => {
 };
 
 type RowObj = {
-  endpoint: string;
-  path: string;
-  method: string;
+  _id: string;
+  endpoint: Endpoint;
   name: string;
   description: string;
   type: string;
   severity: string;
-  recommendations: string;
+  recommendations?: string;
   status: string;
 };
 
-function ThreatTable(props: { tableData: any }) {
-  const userId = localStorage.getItem("id");
+function ThreatTable(props: {
+  tableData: Threat[];
+  updateThreat: (id: string, status: string) => Promise<void>;
+}) {
   const columnHelper = createColumnHelper<RowObj>();
-  const navigate: NavigateFunction = useNavigate();
-  const { tableData } = props;
+  const { tableData, updateThreat } = props;
   const [sorting, setSorting] = useState<SortingState>([]);
-  let defaultData = tableData;
   const columns = [
     columnHelper.accessor("severity", {
       id: "severity",
@@ -86,12 +83,12 @@ function ThreatTable(props: { tableData: any }) {
       ),
       cell: (info) => (
         <div
-          className={`h-full w-[80px] rounded-full ${
+          className={`h-full w-[80px] rounded-md ${
             info.getValue() === "High"
-              ? "bg-red-500"
+              ? "bg-red-500 bg-opacity-80"
               : info.getValue() === "Medium"
-              ? "bg-yellow-500"
-              : "bg-green-500"
+              ? "bg-yellow-500 bg-opacity-80"
+              : "bg-green-500 bg-opacity-80"
           }`}
         >
           <p className="text-sm font-bold text-white flex items-center justify-center">
@@ -116,7 +113,7 @@ function ThreatTable(props: { tableData: any }) {
       ),
     }),
 
-    columnHelper.accessor("method", {
+    columnHelper.accessor("endpoint", {
       id: "method",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
@@ -129,12 +126,12 @@ function ThreatTable(props: { tableData: any }) {
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10 w-[75%] ps-2"
         >
           <p className="text-sm font-bold text-navy-700 dark:text-white">
-            {info.getValue().toUpperCase()}
+            {info.getValue().method.toUpperCase()}
           </p>
         </div>
       ),
     }),
-    columnHelper.accessor("path", {
+    columnHelper.accessor("endpoint", {
       id: "path",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
@@ -143,7 +140,7 @@ function ThreatTable(props: { tableData: any }) {
       ),
       cell: (info) => (
         <p className="text-sm font-bold text-navy-700 dark:text-white">
-          {info.getValue()}
+          {info.getValue().path}
         </p>
       ),
     }),
@@ -179,7 +176,10 @@ function ThreatTable(props: { tableData: any }) {
       ),
       cell: (info) => (
         <div className="flex items-center justify-start gap-3">
-          <button className="bg-navy-50 p-2 rounded-lg flex">
+          <button
+            className="bg-navy-50 p-2 rounded-lg flex"
+            onClick={() => handleUpdate(info.row.original)}
+          >
             {info.getValue() === "Pending" ? "Resolve" : "Reopen"}
           </button>
         </div>
@@ -187,7 +187,17 @@ function ThreatTable(props: { tableData: any }) {
     }),
   ]; // eslint-disable-next-line
   const [globalFilter, setGlobalFilter] = useState<string>("");
-  const [data] = useState<any>(() => [...defaultData]);
+  const [data, setData] = useState<Threat[]>([]);
+
+  useEffect(() => {
+    setData(tableData);
+  }, [tableData]);
+
+  const handleUpdate = async (rowObj: RowObj) => {
+    const id = rowObj._id;
+    const status = rowObj.status === "Pending" ? "Resolved" : "Pending";
+    await updateThreat(id, status);
+  };
 
   const table = useReactTable({
     data,
@@ -215,7 +225,7 @@ function ThreatTable(props: { tableData: any }) {
           Threats Table
         </div>
         <div className="flex items-center justify-between">
-          <div className="flex h-full min-h-[32px] items-center rounded-lg bg-lightPrimary text-navy-700 dark:bg-navy-900 dark:text-white xl:w-[225px]">
+          <div className="flex h-full min-h-[32px] items-center rounded-lg bg-lightPrimary text-navy-700 dark:bg-navy-900 dark:text-white xl:w-[275px]">
             <p className="pl-3 pr-2 text-xl">
               <FiSearch className="h-4 w-4 text-gray-400 dark:text-white" />
             </p>
@@ -227,19 +237,10 @@ function ThreatTable(props: { tableData: any }) {
               className="block h-full min-h-[32px] w-full rounded-full bg-lightPrimary text-sm font-medium text-navy-700 outline-none placeholder:!text-gray-400 dark:bg-navy-900 dark:text-white dark:placeholder:!text-white sm:w-fit"
             />
           </div>
-          <button
-            onClick={() => {
-              navigate("/admin/team");
-            }}
-            className={` linear mx-1 flex items-center justify-center rounded-lg bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
-           hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
-          >
-            <AiOutlinePlus className="h-5 w-5" />
-          </button>
         </div>
       </header>
 
-      <div className="mt-2 overflow-x-scroll xl:overflow-x-hidden">
+      <div className="mt-2 overflow-x-scroll xl:overflow-x-hidden h-full">
         <table className="w-full">
           <thead>
             {table.getHeaderGroups().map((headerGroup) => (

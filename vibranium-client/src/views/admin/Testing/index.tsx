@@ -1,19 +1,34 @@
-import TableSkeleton from "@/components/skeleton/TableSkeleton";
-import EndpointTable from "./components/EndpointTable";
-import { useAppSelector } from "@/app/store";
-import { vulnerabilities } from "@/constants/miscellaneous";
+import { useState } from "react";
+import TestTable from "./components/TestTable";
+import { TestObject } from "@/apis/tests";
+import SingleTestDrawer from "./components/SingleTestDrawer";
 
 const Endpoints = () => {
-  const endpoints = useAppSelector((state) => state.endpoints.data);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [singleTest, setSingleTest] = useState<TestObject | null>(null);
+
+  const closeDrawer = () => {
+    setDrawerOpen(false);
+    setSingleTest(null);
+  };
+
+  const openDrawer = (singleTest: TestObject) => {
+    setSingleTest(singleTest);
+    setDrawerOpen(true);
+  };
+
   return (
     <div>
       <div className="mx-3 my-3 grid grid-cols-1">
-        {endpoints.length > 0 ? (
-          <EndpointTable tableData={vulnerabilities} />
-        ) : (
-          <TableSkeleton />
-        )}
+        <TestTable openDrawer={openDrawer} />
       </div>
+      {drawerOpen && singleTest !== null && (
+        <SingleTestDrawer
+          open={drawerOpen}
+          hide={closeDrawer}
+          singleTest={singleTest}
+        />
+      )}
     </div>
   );
 };

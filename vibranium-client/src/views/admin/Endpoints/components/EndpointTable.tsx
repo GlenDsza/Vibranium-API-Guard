@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { FC, useEffect, useState } from "react";
 import {
   createColumnHelper,
   FilterFn,
@@ -14,11 +14,10 @@ import Card from "@/components/card";
 import { FiSearch } from "react-icons/fi";
 import Pagination from "@/components/pagination/Pagination";
 import ApiDetailDrawer from "./ApiDetailDrawer";
-import { Parameter } from "@/app/features/EndpointSlice";
+import { Endpoint, Parameter } from "@/app/features/EndpointSlice";
 import { Schema, Threat } from "@/utils/interfaces";
 import { FaInfo } from "react-icons/fa";
-import { enableEndpointApi } from "@/apis/endpoints";
-import { toast } from "react-toastify";
+import Checkbox from "@/components/checkbox";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -66,14 +65,30 @@ type RowObj = {
     }
   >;
   threats: Threat[];
+  secure: boolean;
   createdAt: string;
   updatedAt: string;
-  actions: string | undefined;
+  actions?: string | undefined;
 };
 
-const EndpointTable = (props: { tableData: any, onOpen: any }) => {
+interface EndpointTableProps {
+  tableData: Endpoint[];
+  onProgressOpen: () => void;
+  onProgressClose: () => void;
+  updateEndpoint: (
+    id: string,
+    enabled?: boolean,
+    secure?: boolean
+  ) => Promise<void>;
+}
+
+const EndpointTable: FC<EndpointTableProps> = ({
+  tableData,
+  onProgressOpen,
+  onProgressClose,
+  updateEndpoint,
+}) => {
   const columnHelper = createColumnHelper<RowObj>();
-  const { tableData } = props;
 
   const [sorting, setSorting] = useState<SortingState>([]);
   const [showDrawer, setShowDrawer] = useState<boolean>(false);
@@ -82,26 +97,6 @@ const EndpointTable = (props: { tableData: any, onOpen: any }) => {
   const handleView = (rowObj: RowObj) => {
     setSelectedRow(rowObj);
     setShowDrawer(true);
-  };
-
-  const enableEndpoint = (id: string, row: RowObj, enable: boolean = true) => {
-    const modified_row = {
-      ...row,
-      enabled: enable,
-    };
-    enableEndpointApi(id, modified_row).then((res) => {
-      if (res.success) {
-        const updatedData = tableData.map((item: RowObj) => {
-          if (item._id === id) {
-            return modified_row;
-          }
-          return item;
-        });
-        _(updatedData);
-        const toastmessage = enable ? "Enabled" : "Disabled";
-        toast.success("Endpoint " + toastmessage + " Successfully");
-      }
-    });
   };
 
   const columns = [
@@ -136,7 +131,7 @@ const EndpointTable = (props: { tableData: any, onOpen: any }) => {
         </p>
       ),
     }),
-    columnHelper.accessor("threats", {
+    columnHelper.accessor("_id", {
       id: "risk",
       header: () => (
         <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
@@ -144,7 +139,7 @@ const EndpointTable = (props: { tableData: any, onOpen: any }) => {
         </p>
       ),
       cell: (info) => {
-        const threats = info.getValue() as Threat[];
+        const threats = [...info.row.original.threats];
         const risk = threats.reduce((acc, threat) => {
           if (threat.severity === "High") {
             return "High";
@@ -210,11 +205,7 @@ const EndpointTable = (props: { tableData: any, onOpen: any }) => {
             className={` flex items-center justify-center rounded-lg bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
             onClick={() =>
-              enableEndpoint(
-                info.row.original._id,
-                info.row.original,
-                !info.getValue()
-              )
+              updateEndpoint(info.row.original._id, !info.getValue(), undefined)
             }
           >
             {info.getValue() ? "Disable" : "Enable"}
@@ -229,9 +220,27 @@ const EndpointTable = (props: { tableData: any, onOpen: any }) => {
         </div>
       ),
     }),
+    columnHelper.accessor("secure", {
+      id: "secure",
+      header: () => (
+        <p className="text-sm font-bold text-gray-600 dark:text-white flex justify-center">
+          SECURE
+        </p>
+      ),
+      cell: (info) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            onClick={() =>
+              updateEndpoint(info.row.original._id, undefined, !info.getValue())
+            }
+            checked={info.getValue()}
+          />
+        </div>
+      ),
+    }),
   ]; // eslint-disable-next-line
 
-  const [data, _] = useState(() => [...tableData]);
+  const [data, setData] = useState<Endpoint[]>([]);
   const [globalFilter, setGlobalFilter] = useState<string>("");
   const table = useReactTable({
     data,
@@ -251,6 +260,10 @@ const EndpointTable = (props: { tableData: any, onOpen: any }) => {
     getSortedRowModel: getSortedRowModel(),
     debugTable: true,
   });
+
+  useEffect(() => {
+    setData(tableData);
+  }, [tableData]);
 
   return (
     <>
@@ -334,7 +347,8 @@ const EndpointTable = (props: { tableData: any, onOpen: any }) => {
           endpoint={selectedRow}
           open={showDrawer}
           hide={() => setShowDrawer(false)}
-          onOpen={props.onOpen}
+          onProgressOpen={onProgressOpen}
+          onProgressClose={onProgressClose}
         />
       )}
     </>

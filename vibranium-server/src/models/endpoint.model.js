@@ -66,6 +66,7 @@ const endpointSchema = new mongoose.Schema(
         ref: "Threat",
       },
     ],
+    secure: { type: Boolean, required: true, default: false },
   },
   {
     timestamps: true,

@@ -2,7 +2,7 @@ import Endpoint from "../models/endpoint.model.js";
 import Schema from "../models/schema.model.js";
 
 export const getEndpoints = async (req, res) => {
-  const { id, path, organization } = req.query;
+  const { id, path, organization, method } = req.query;
 
   let wherePayload = {};
 
@@ -11,6 +11,9 @@ export const getEndpoints = async (req, res) => {
   }
   if (path) {
     wherePayload = { ...wherePayload, path };
+  }
+  if (method) {
+    wherePayload = { ...wherePayload, method };
   }
   if (organization) {
     wherePayload = { ...wherePayload, organization };

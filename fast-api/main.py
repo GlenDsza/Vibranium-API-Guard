@@ -1,6 +1,6 @@
-from fastapi import FastAPI, Depends, HTTPException, status, Body, Path
+from fastapi import FastAPI, Depends, HTTPException, status, Response
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-from pydantic import BaseModel
+from pydantic import BaseModel, constr
 from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
 from sqlalchemy.orm import declarative_base
 from sqlalchemy.orm import sessionmaker, relationship
@@ -126,16 +126,28 @@ def get_current_user(token: str = Depends(oauth2_scheme), db=Depends(get_db)):
     return user
 
 
+def set_headers(response: Response):
+    response.headers["Content-Security-Policy"] = "default-src 'self'"
+    response.headers["Strict-Transport-Security"] = (
+        "max-age=31536000; includeSubDomains"
+    )
+    response.headers["X-Frame-Options"] = "DENY"
+    response.headers["X-Content-Type-Options"] = "nosniff"
+    response.headers["X-XSS-Protection"] = "1; mode=block"
+    response.headers["Referrer-Policy"] = "no-referrer-when-downgrade"
+    response.headers["Permissions-Policy"] = "geolocation=(), microphone=(), camera=()"
+
+
 # FastAPI models
 class SignupRequest(BaseModel):
-    username: str
-    email: str
-    password: str
+    username: constr(max_length=50)  # type: ignore
+    email: constr(max_length=50)  # type: ignore
+    password: constr(max_length=50)  # type: ignore
 
 
 class ProductCreate(BaseModel):
-    name: str
-    description: Optional[str]
+    name: constr(max_length=50)  # type: ignore
+    description: Optional[constr(max_length=50)]  # type: ignore
     price: float
     stock: int
 
@@ -146,6 +158,11 @@ class CartItemCreate(BaseModel):
 
 
 class OrderCreate(BaseModel):
+    address: str
+
+
+class OrderSend(BaseModel):
+    id: int
     address: str
 
 
@@ -197,30 +214,36 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db=Depends(get
 
 # Product Endpoints
 @app.post("/products", response_model=ProductCreate)
-async def create_product(product: ProductCreate, db=Depends(get_db)):
+async def create_product(
+    response: Response, product: ProductCreate, db=Depends(get_db)
+):
     new_product = Product(**product.dict())
     db.add(new_product)
     db.commit()
     db.refresh(new_product)
+    set_headers(response)
     return new_product
 
 
 @app.get("/products", response_model=List[ProductCreate])
-async def get_products(db=Depends(get_db)):
+async def get_products(response: Response, db=Depends(get_db)):
+    set_headers(response)
     return db.query(Product).all()
 
 
 @app.get("/products/{product_id}", response_model=ProductCreate)
-async def get_product(product_id: int, db=Depends(get_db)):
+async def get_product(response: Response, product_id: int, db=Depends(get_db)):
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
+    set_headers(response)
     return product
 
 
 # Cart Endpoints
 @app.get("/cart/{uid}", response_model=List[CartItemCreate])
-async def get_cart(uid: int, db=Depends(get_db)):
+async def get_cart(uid: int, response: Response, db=Depends(get_db)):
+    set_headers(response)
     return db.query(CartItem).filter(CartItem.user_id == uid).all()
 
 
@@ -238,7 +261,7 @@ async def add_to_cart(
 
 
 # Order Endpoints
-@app.get("/orders", response_model=List[OrderCreate])
+@app.get("/orders", response_model=List[OrderSend])
 async def get_orders(
     current_user: User = Depends(get_current_user), db=Depends(get_db)
 ):

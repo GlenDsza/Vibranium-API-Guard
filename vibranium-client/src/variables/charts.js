@@ -1,7 +1,7 @@
 export const barChartDataDailyTraffic = [
   {
     name: "APIs",
-    data: [4, 5, 14],
+    data: [1, 2, 2],
   },
 ];
 
@@ -26,7 +26,7 @@ export const barChartOptionsDailyTraffic = {
     theme: "dark",
   },
   xaxis: {
-    categories: ["High", "Medium", "Low"],
+    categories: ["None","High", "Medium", "Low"],
     show: true,
     labels: {
       show: true,
@@ -279,3 +279,11 @@ export const lineChartOptionsTotalSpent = {
     show: false,
   },
 };
+
+export const colorSamples = [
+  "#4318FF",
+  "#6AD2FF",
+  "#A8A8A8",
+  "#050C9C",
+  "#A7E6FF",
+];

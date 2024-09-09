@@ -22,16 +22,8 @@ const notifications: Notification[] = [
   {
     id: "1",
     title: "Threat Detected",
-    description: "Broken Object Level Authentication @ /home/report",
+    description: "Unsafe consumpion of external API @ /products",
     type: "incident",
-    station_name: "Lagos",
-    created_at: new Date(),
-  },
-  {
-    id: "2",
-    title: "Breach Reported",
-    description: "SQL Injection @ /sign-in",
-    type: "report",
     station_name: "Lagos",
     created_at: new Date(),
   },
