@@ -20,13 +20,19 @@ export const lint = async (req, res) => {
         // Run Spectral on the provided spec
         const results = await spectral.run(spec);
         
+        let data = [];
+        // Return the linting results
+        results.forEach(issue => {
+            if(issue.severity >= 1){
+                data.push(issue);
+            }
+        });
         // check if there are any errors
-        if (results.length === 0) {
+        if (data.length === 0) {
             res.status(200).json({ message: 'No errors found' });
             return;
         } else {
-            // Return the linting results
-            res.status(400).json(results);
+            res.status(400).json(data);
             return
         }
     } catch (error) {

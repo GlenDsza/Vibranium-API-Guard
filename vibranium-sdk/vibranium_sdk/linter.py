@@ -14,10 +14,10 @@ class Linter:
     def fetch_openapi_spec(self):
         """Fetches the OpenAPI specification from the FastAPI application."""
         try:
-            response = requests.get(self.openapi_url)
-            # response = requests.get("http://localhost:8000/openapi.json")
+            # response = requests.get(self.openapi_url)
+            response = requests.get("http://localhost:8000/openapi.json")
             response.raise_for_status()  # Raise an exception for HTTP errors
-            # save the response to a file
+            # save the response to a file 
             with open("openapi.json", "w") as f:
                 f.write(json.dumps(response.json(), indent=4))
             return response.json()
@@ -43,7 +43,8 @@ class Linter:
             line = issue["range"]["start"]["line"]
             issue_type = issue["code"]
             severity = issue["severity"]
-            table_data.append([path, severity, line, message])
+            if severity >= 1:
+                table_data.append([path, severity, line, message])
             
         # Print the table
         headers = ["Path", "Severity", "Line", "Message"]
