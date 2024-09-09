@@ -28,8 +28,14 @@ class Protector:
 
         self.MANUAL_BLOCKED_IPS = set(blocked_ips)
 
-    def is_valid_ip(self, ip):
+    def is_valid_ip(self, ip, db):
         """Check if the IP address is allowed."""
+
+        org = db["organizations"].find_one({"name": "Flipkart"})
+        if org and "blockedIps" in org:
+            self.MANUAL_BLOCKED_IPS = set(org["blockedIps"])
+
+        # Check if the IP is in the manual block list
         valid = ip not in self.MANUAL_BLOCKED_IPS
         if not valid:
             logging.warning(f"Blocked request from invalid IP: {ip}")

@@ -59,7 +59,7 @@ def log_traffic(response):
 def filter_ip():
     """Filter out requests from non-allowed IPs."""
     client_ip = request.remote_addr
-    if not protector.is_valid_ip(client_ip):
+    if not protector.is_valid_ip(client_ip, db):
         return Response("Forbidden: Invalid IP Address", status=403)
 
 

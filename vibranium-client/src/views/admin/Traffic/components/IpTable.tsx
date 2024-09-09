@@ -78,8 +78,8 @@ const EndpointTable = ({ tableData }: { tableData: RowObj[] }) => {
         </p>
       ),
     }),
-    columnHelper.display({
-      id: "actions",
+    columnHelper.accessor("ip", {
+      id: "action",
       header: () => (
         <p className="mr-1 inline text-sm font-bold w-1/4 text-gray-600 dark:text-white">
           UNBLOCK
@@ -89,7 +89,7 @@ const EndpointTable = ({ tableData }: { tableData: RowObj[] }) => {
         <div className="flex items-center space-x-2">
           <button
             onClick={() => {
-              unblockIp(info.row.values.ip);
+              unblockIp(info.getValue());
             }}
             className={` flex items-center justify-center rounded-lg bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
