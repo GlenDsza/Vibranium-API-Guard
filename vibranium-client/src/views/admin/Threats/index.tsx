@@ -10,6 +10,9 @@ const Threats = () => {
 
   const getThreats = async () => {
     await axios.get("http://localhost:4000/api/threats").then((response) => {
+      response.data.sort((a: Threat, b: Threat) => {
+        return a.createdAt < b.createdAt ? 1 : -1;
+      });
       setThreats(response.data);
     });
   };

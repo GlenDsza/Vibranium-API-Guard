@@ -13,7 +13,7 @@ import { RankingInfo, rankItem } from "@tanstack/match-sorter-utils";
 import Card from "@/components/card";
 import { FiSearch } from "react-icons/fi";
 import Pagination from "@/components/pagination/Pagination";
-import { getTests } from "@/apis/tests";
+import { getTests, deleteTest } from "@/apis/tests";
 import { TestObject } from "@/apis/tests";
 
 declare module "@tanstack/table-core" {
@@ -50,6 +50,19 @@ const EndpointTable = ({
   const columnHelper = createColumnHelper<RowObj>();
 
   const [sorting, setSorting] = useState<SortingState>([]);
+
+  const deleteTestHandler = (singleTest: TestObject) => {
+    deleteTest(singleTest._id).then((res) => {
+      if (res) {
+        const new_rows = data.filter(
+          (row) => row.actions._id !== singleTest._id
+        );
+        _(new_rows);
+      } else {
+        console.error("Failed to delete test");
+      }
+    });
+  };
 
   const columns = [
     columnHelper.accessor("method", {
@@ -140,6 +153,14 @@ const EndpointTable = ({
             onClick={() => openDrawer(info.getValue())}
           >
             View
+          </button>
+          <button
+            className="text-sm font-bold text-red-500 bg-gray-200 rounded-md px-2 py-1 ml-2"
+            onClick={() => {
+              deleteTestHandler(info.getValue());
+            }}
+          >
+            Clear
           </button>
         </div>
       ),

@@ -18,6 +18,7 @@ import {
 import { Endpoint } from "@/app/features/EndpointSlice";
 import { Collection } from "@/utils/interfaces";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 interface ApiDetailDrawerProps {
   open: boolean;
@@ -38,9 +39,6 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
     _id,
     method,
     path,
-    parameters,
-    enabled,
-    operationId,
     summary,
     organization,
     requestBody,
@@ -58,6 +56,10 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
   const [accOpen, setAccOpen] = useState<number>(0);
   const [collections, setCollections] = useState<Collection[]>([]);
   const [newResponses, setNewResponses] = useState<Map<string, any>>(new Map());
+  const [secure, setSecure] = useState<boolean>(false);
+
+  const navigate = useNavigate();
+
   const opResponse = useRef<Map<string, any>>(null);
   const handleOpen = (value: number) =>
     setAccOpen(accOpen === value ? 0 : value);
@@ -77,13 +79,15 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
   const runTests = async (): Promise<void> => {
     hide();
     onProgressOpen();
-    const res = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/api/test/${_id}`,
-      {
-        organization: organization._id,
-      }
-    );
-    console.log(res.data);
+    await axios.post(`${import.meta.env.VITE_BACKEND_URL}/api/test/${_id}`, {
+      organization: organization._id,
+      secure: secure,
+    });
+    // wait 9 seconds
+    setTimeout(() => {
+      onProgressClose();
+      navigate(`/admin/testing/`);
+    }, 8000);
   };
 
   const computeRisk = () => {
@@ -181,6 +185,17 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
               Run Test
               <FaPlay className="ms-2 h-4 w-4" />
             </button>
+            <div className="flex items-center justify-center mt-2">
+              <p className="text-xs font-bold text-gray-600 dark:text-white">
+                Secure
+              </p>
+              <input
+                type="checkbox"
+                className="ms-2 accent-brand-500"
+                checked={secure}
+                onChange={() => setSecure(!secure)}
+              />
+            </div>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">

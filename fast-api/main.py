@@ -161,6 +161,11 @@ class OrderCreate(BaseModel):
     address: str
 
 
+class OrderSend(BaseModel):
+    id: int
+    address: str
+
+
 class UserResponse(BaseModel):
     id: int
     username: str
@@ -206,24 +211,29 @@ async def login(form_data: OAuth2PasswordRequestForm = Depends(), db=Depends(get
 
 # Product Endpoints
 @app.post("/products", response_model=ProductCreate)
-async def create_product(product: ProductCreate, db=Depends(get_db)):
+async def create_product(
+    response: Response, product: ProductCreate, db=Depends(get_db)
+):
     new_product = Product(**product.dict())
     db.add(new_product)
     db.commit()
     db.refresh(new_product)
+    set_headers(response)
     return new_product
 
 
 @app.get("/products", response_model=List[ProductCreate])
-async def get_products(db=Depends(get_db)):
+async def get_products(response: Response, db=Depends(get_db)):
+    set_headers(response)
     return db.query(Product).all()
 
 
 @app.get("/products/{product_id}", response_model=ProductCreate)
-async def get_product(product_id: int, db=Depends(get_db)):
+async def get_product(response: Response, product_id: int, db=Depends(get_db)):
     product = db.query(Product).filter(Product.id == product_id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
+    set_headers(response)
     return product
 
 
@@ -248,7 +258,7 @@ async def add_to_cart(
 
 
 # Order Endpoints
-@app.get("/orders", response_model=List[OrderCreate])
+@app.get("/orders", response_model=List[OrderSend])
 async def get_orders(
     current_user: User = Depends(get_current_user), db=Depends(get_db)
 ):

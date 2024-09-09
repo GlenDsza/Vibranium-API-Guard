@@ -37,3 +37,13 @@ export async function getTests(): Promise<TestOutput> {
     return { success: false };
   }
 }
+
+export async function deleteTest(id: string): Promise<boolean> {
+  try {
+    await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/test/${id}`);
+    return true;
+  } catch (error) {
+    console.error(error);
+    return false;
+  }
+}

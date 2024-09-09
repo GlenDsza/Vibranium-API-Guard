@@ -8,6 +8,8 @@ import {
   testPasswordLeak,
   testParamLimits,
   testSecurityHeaders,
+  testIDOR,
+  testExcessiveIDORExposure,
 } from "../tests/endpointtests.js";
 import { FASTAPI_URL } from "../config.js";
 
@@ -30,6 +32,7 @@ export const testEndpoint = async (req, res) => {
 
     let endpoint_path = endpoint.path;
     let param = "";
+    let param_type = "";
     let use_param = false;
 
     // check if endpoint is of the form /endpoint/{paramname}
@@ -42,7 +45,7 @@ export const testEndpoint = async (req, res) => {
       }
 
       use_param = true;
-      const param_type = endpoint.parameters[0]?.schemaRef?.type;
+      param_type = endpoint.parameters[0]?.schemaRef?.type;
       if (param_type === "string") {
         param = "test";
       } else if (param_type === "number" || param_type === "integer") {
@@ -108,6 +111,19 @@ export const testEndpoint = async (req, res) => {
       testSuccess: passwordRes.success,
     });
 
+    const idorExposureTestRes = await testExcessiveIDORExposure(
+      FASTAPI_URL + endpoint_path + param,
+      token,
+      id,
+      endpoint.method,
+      payload
+    );
+
+    testsPerformed.push({
+      testName: "Internal Data Exposure",
+      testSuccess: idorExposureTestRes.success,
+    });
+
     const user_id = organizationFound.testingCredentials.userId;
     // Test for BOLA
     if (use_param) {
@@ -121,6 +137,19 @@ export const testEndpoint = async (req, res) => {
       testsPerformed.push({
         testName: "Broken Object Level Authorization",
         testSuccess: BolaRes.success,
+      });
+
+      const idorTestRes = await testIDOR(
+        FASTAPI_URL + endpoint_path,
+        token,
+        id,
+        param_type,
+        endpoint.method,
+        payload
+      );
+      testsPerformed.push({
+        testName: "Insecure Direct Object Reference",
+        testSuccess: idorTestRes.success,
       });
     }
 
@@ -169,6 +198,22 @@ export const getTests = async (req, res) => {
   try {
     const tests = await Test.find().populate("endpoint", "path method");
     return res.status(200).json({ tests });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+export const deleteTest = async (req, res) => {
+  const { id } = req.params;
+  try {
+    const test = await Test.findById(id);
+    if (!test) {
+      return res.status(404).json({ message: "Test not found" });
+    } else {
+      await Test.findByIdAndDelete(id);
+      return res.status(200).json({ message: "Test deleted successfully" });
+    }
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: "Internal server error" });
