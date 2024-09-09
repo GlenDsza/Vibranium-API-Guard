@@ -2,7 +2,6 @@ import { Modal, ModalOverlay, ModalContent, ModalBody } from "@chakra-ui/modal";
 import Card from "@/components/card";
 import { FC, useEffect, useState } from "react";
 import Progress from "@/components/progress";
-import { on } from "events";
 
 interface ProgressBarModalProps {
   isOpen: boolean;
@@ -23,18 +22,14 @@ const ProgressBarModal: FC<ProgressBarModalProps> = ({
         // increase progress by random 0-25% every second and max out at 90% then pause
         const num = Math.floor(Math.random() * 25);
         setProg((prog) => {
-          if (prog < 90) {
-            if (prog + num >= 90) {
-              clearInterval(interval);
-              setProg(90);
-              return 90;
-            }
+          if (prog < 100) {
+            if (prog + num > 100) return 100;
             return prog + num;
           } else {
             clearInterval(interval);
             setProg(100);
             onClose();
-            return prog;
+            return 0;
           }
         });
       }, 1000);

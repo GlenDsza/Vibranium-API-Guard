@@ -20,11 +20,20 @@ const Endpoints = () => {
 
   const updateEndpointAndReload = async (
     id: string,
-    enabled: boolean
+    enabled?: boolean,
+    secure?: boolean
   ): Promise<void> => {
-    await dispatch(updateEndpoint({ endpointId: id, data: { enabled } }));
+    if (enabled === undefined && secure === undefined) return;
+    if (enabled !== undefined)
+      await dispatch(
+        updateEndpoint({ endpointId: id, data: { enabled: enabled } })
+      );
+    if (secure !== undefined)
+      await dispatch(
+        updateEndpoint({ endpointId: id, data: { secure: secure } })
+      );
     await getEndpoints();
-    toast.success("Endpoint status updated successfully");
+    toast.success("Endpoint updated successfully");
   };
 
   const {

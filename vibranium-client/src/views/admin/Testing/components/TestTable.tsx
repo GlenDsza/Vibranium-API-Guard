@@ -15,6 +15,8 @@ import { FiSearch } from "react-icons/fi";
 import Pagination from "@/components/pagination/Pagination";
 import { getTests, deleteTest } from "@/apis/tests";
 import { TestObject } from "@/apis/tests";
+import { FaTrash } from "react-icons/fa6";
+import { FaRegEye } from "react-icons/fa";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -37,6 +39,7 @@ type RowObj = {
   method: string;
   endpoint: string;
   date: string;
+  time: string;
   tests_performed: number;
   status: boolean;
   actions: TestObject;
@@ -109,15 +112,32 @@ const EndpointTable = ({
         </p>
       ),
     }),
+    columnHelper.accessor("time", {
+      id: "time",
+      header: () => (
+        <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
+          TIME
+        </p>
+      ),
+      cell: (info) => (
+        <p className="text-sm font-bold text-navy-700 dark:text-white">
+          {info.getValue()}
+        </p>
+      ),
+    }),
     columnHelper.accessor("tests_performed", {
       id: "risk",
       header: () => (
-        <p className="mr-1 inline text-sm font-bold text-gray-600 dark:text-white">
+        <p className="mr-1 text-sm font-bold text-gray-600 dark:text-white flex justify-center">
           TESTS PERFORMED
         </p>
       ),
       cell: (info) => {
-        return <p>{info.getValue()}</p>;
+        return (
+          <p className="text-sm font-bold text-navy-700 dark:text-white flex justify-center">
+            {info.getValue()}
+          </p>
+        );
       },
     }),
     columnHelper.accessor("status", {
@@ -147,20 +167,20 @@ const EndpointTable = ({
         </p>
       ),
       cell: (info) => (
-        <div className="flex items-center justify-start">
+        <div className="flex items-center justify-start gap-3">
           <button
-            className="text-sm font-bold text-brand-700 bg-gray-200 rounded-md px-2 py-1"
             onClick={() => openDrawer(info.getValue())}
+            className={` flex items-center justify-center rounded-lg bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
+           hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
           >
-            View
+            <FaRegEye className="h-4 w-4" />
           </button>
           <button
-            className="text-sm font-bold text-red-500 bg-gray-200 rounded-md px-2 py-1 ml-2"
-            onClick={() => {
-              deleteTestHandler(info.getValue());
-            }}
+            onClick={() => deleteTestHandler(info.getValue())}
+            className={` flex items-center justify-center rounded-lg bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
+           hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
           >
-            Clear
+            <FaTrash className="h-4 w-4" />
           </button>
         </div>
       ),
@@ -180,12 +200,22 @@ const EndpointTable = ({
           );
         });
         const rows: RowObj[] = data.map((row) => {
+          const { endpoint, createdAt, testsPerformed } = row;
+          let time = createdAt.split("T")[1].split(".")[0];
+          let hours = parseInt(time.split(":")[0]);
+          let minutes = parseInt(time.split(":")[1]);
+          let suffix = hours >= 12 ? "PM" : "AM";
+          hours = hours % 12;
+          hours = hours ? hours : 12;
+          time = hours + ":" + minutes + " " + suffix;
+
           return {
-            method: row.endpoint.method,
-            endpoint: row.endpoint.path,
-            date: row.createdAt.split("T")[0],
-            tests_performed: row.testsPerformed.length,
-            status: row.testsPerformed.every((test) => test.testSuccess),
+            method: endpoint.method,
+            endpoint: endpoint.path,
+            date: createdAt.split("T")[0],
+            time,
+            tests_performed: testsPerformed.length,
+            status: testsPerformed.every((test) => test.testSuccess),
             actions: row,
           };
         });

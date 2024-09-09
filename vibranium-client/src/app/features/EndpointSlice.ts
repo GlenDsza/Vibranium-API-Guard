@@ -41,6 +41,7 @@ export interface Endpoint {
     }
   >;
   threats: Threat[];
+  secure: boolean;
   createdAt: string;
   updatedAt: string;
 }

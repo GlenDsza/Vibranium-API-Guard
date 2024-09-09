@@ -17,6 +17,7 @@ import ApiDetailDrawer from "./ApiDetailDrawer";
 import { Endpoint, Parameter } from "@/app/features/EndpointSlice";
 import { Schema, Threat } from "@/utils/interfaces";
 import { FaInfo } from "react-icons/fa";
+import Checkbox from "@/components/checkbox";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -64,6 +65,7 @@ type RowObj = {
     }
   >;
   threats: Threat[];
+  secure: boolean;
   createdAt: string;
   updatedAt: string;
   actions?: string | undefined;
@@ -73,7 +75,11 @@ interface EndpointTableProps {
   tableData: Endpoint[];
   onProgressOpen: () => void;
   onProgressClose: () => void;
-  updateEndpoint: (id: string, enabled: boolean) => Promise<void>;
+  updateEndpoint: (
+    id: string,
+    enabled?: boolean,
+    secure?: boolean
+  ) => Promise<void>;
 }
 
 const EndpointTable: FC<EndpointTableProps> = ({
@@ -199,7 +205,7 @@ const EndpointTable: FC<EndpointTableProps> = ({
             className={` flex items-center justify-center rounded-lg bg-lightPrimary p-[0.4rem]  font-medium text-brand-500 transition duration-200
            hover:cursor-pointer hover:bg-gray-100 dark:bg-navy-700 dark:text-white dark:hover:bg-white/20 dark:active:bg-white/10`}
             onClick={() =>
-              updateEndpoint(info.row.original._id, !info.getValue())
+              updateEndpoint(info.row.original._id, !info.getValue(), undefined)
             }
           >
             {info.getValue() ? "Disable" : "Enable"}
@@ -211,6 +217,24 @@ const EndpointTable: FC<EndpointTableProps> = ({
           >
             <FaInfo className="h-4 w-4" />
           </button>
+        </div>
+      ),
+    }),
+    columnHelper.accessor("secure", {
+      id: "secure",
+      header: () => (
+        <p className="text-sm font-bold text-gray-600 dark:text-white flex justify-center">
+          SECURE
+        </p>
+      ),
+      cell: (info) => (
+        <div className="flex items-center justify-center">
+          <Checkbox
+            onClick={() =>
+              updateEndpoint(info.row.original._id, undefined, !info.getValue())
+            }
+            checked={info.getValue()}
+          />
         </div>
       ),
     }),

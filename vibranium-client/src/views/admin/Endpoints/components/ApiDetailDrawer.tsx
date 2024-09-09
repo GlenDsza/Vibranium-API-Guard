@@ -18,7 +18,6 @@ import {
 import { Endpoint } from "@/app/features/EndpointSlice";
 import { Collection } from "@/utils/interfaces";
 import axios from "axios";
-import { useNavigate } from "react-router-dom";
 
 interface ApiDetailDrawerProps {
   open: boolean;
@@ -33,7 +32,6 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
   hide,
   endpoint,
   onProgressOpen,
-  onProgressClose,
 }) => {
   const {
     _id,
@@ -46,20 +44,15 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
     threats,
     createdAt,
     updatedAt,
+    parameters,
+    enabled,
+    operationId,
+    secure,
   } = endpoint;
-  // let newResponses = new Map<string, any>();
-  // for (const [key, value] of Object.entries(responses)) {
-  //   newResponses.set(key, value);
-  // }
-  // console.log(newResponses.forEach((value) => value));
+
   const [risk, setRisk] = useState<string>("Low");
   const [accOpen, setAccOpen] = useState<number>(0);
   const [collections, setCollections] = useState<Collection[]>([]);
-  const [newResponses, setNewResponses] = useState<Map<string, any>>(new Map());
-  const [secure, setSecure] = useState<boolean>(false);
-
-  const navigate = useNavigate();
-
   const opResponse = useRef<Map<string, any>>(null);
   const handleOpen = (value: number) =>
     setAccOpen(accOpen === value ? 0 : value);
@@ -83,11 +76,6 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
       organization: organization._id,
       secure: secure,
     });
-    // wait 9 seconds
-    setTimeout(() => {
-      onProgressClose();
-      navigate(`/admin/testing/`);
-    }, 8000);
   };
 
   const computeRisk = () => {
@@ -115,7 +103,6 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
     for (const [key, value] of Object.entries(responses)) {
       temp.set(key, value);
     }
-    setNewResponses(temp);
     opResponse.current = temp;
   };
 
@@ -185,17 +172,6 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
               Run Test
               <FaPlay className="ms-2 h-4 w-4" />
             </button>
-            <div className="flex items-center justify-center mt-2">
-              <p className="text-xs font-bold text-gray-600 dark:text-white">
-                Secure
-              </p>
-              <input
-                type="checkbox"
-                className="ms-2 accent-brand-500"
-                checked={secure}
-                onChange={() => setSecure(!secure)}
-              />
-            </div>
           </div>
         </div>
         <div className="grid grid-cols-2 gap-4">
@@ -207,7 +183,9 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
               </p>
             </div>
             <p className="text-sm font-bold ms-3">
-              {collections.map((collection) => collection.name).join(", ")}
+              {collections.length > 0
+                ? collections.map((collection) => collection.name).join(", ")
+                : "-"}
             </p>
           </div>
 
@@ -229,7 +207,9 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
                 Access Type
               </p>
             </div>
-            <p className="text-sm font-bold ms-3">Public</p>
+            <p className="text-sm font-bold ms-3">
+              {secure ? "Secure" : "Public"}
+            </p>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -275,18 +255,42 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
                 borderBottomWidth: "2px",
               }}
             >
+              Structure
+            </Tab>
+            <Tab className="text-sm font-bold text-gray-600 dark:text-white  focus:text-brand-800 focus:border-b-2 focus:border-brand-800 focus:bg-lightPrimary  p-3 rounded-md rounded-b-none pb-2">
               Schema
             </Tab>
             <Tab className="text-sm font-bold text-gray-600 dark:text-white  focus:text-brand-800 focus:border-b-2 focus:border-brand-800 focus:bg-lightPrimary  p-3 rounded-md rounded-b-none pb-2">
-              Values
+              Tests
             </Tab>
             <Tab className="text-sm font-bold text-gray-600 dark:text-white  focus:text-brand-800 focus:border-b-2 focus:border-brand-800 focus:bg-lightPrimary  p-3 rounded-md rounded-b-none pb-2">
-              Dependency Graph
+              Threats
             </Tab>
           </TabList>
 
           <TabPanels>
             <TabPanel>
+              <div className="mt-6 ms-3 grid grid-cols-3">
+                <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                  Enabled
+                </div>
+                <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                  {enabled ? "true" : "false"}
+                </div>
+              </div>
+
+              <hr className="m-3" />
+
+              <div className="ms-3 grid grid-cols-3">
+                <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                  Operation ID
+                </div>
+                <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                  {operationId}
+                </div>
+              </div>
+
+              <hr className="m-3 mb-1" />
               <Accordion
                 open={accOpen === 1}
                 icon={<NewIcon id={1} open={accOpen} />}
@@ -296,6 +300,81 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
               >
                 <AccordionHeader
                   onClick={() => handleOpen(1)}
+                  placeholder={true}
+                  onPointerEnterCapture={undefined}
+                  onPointerLeaveCapture={undefined}
+                >
+                  <p className="font-bold ms-3">Params</p>
+                </AccordionHeader>
+                <AccordionBody>
+                  <div className="ms-3">
+                    {parameters.length < 1 ? (
+                      <p>
+                        <span className="text-gray-600 dark:text-white">
+                          No parameters
+                        </span>
+                      </p>
+                    ) : (
+                      parameters.map((param) => (
+                        <div className="bg-gray-100 dark:bg-navy-700 dark:text-white p-3 rounded-lg">
+                          <div className="grid grid-cols-3">
+                            <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                              name
+                            </div>
+                            <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                              {param.name}
+                            </div>
+                          </div>
+
+                          <hr className="my-3 bg-gray-300 h-[0.1rem]" />
+
+                          <div className="grid grid-cols-3">
+                            <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                              in
+                            </div>
+                            <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                              {param.in}
+                            </div>
+                          </div>
+
+                          <hr className="my-3 bg-gray-300 h-[0.1rem]" />
+
+                          <div className="grid grid-cols-3">
+                            <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                              type
+                            </div>
+                            <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                              {param.schemaRef.type}
+                            </div>
+                          </div>
+
+                          <hr className="my-3 bg-gray-300 h-[0.1rem]" />
+
+                          <div className="grid grid-cols-3">
+                            <div className="col-span-1 flex justify-start items-center text-sm font-semibold text-gray-600 dark:text-white">
+                              required
+                            </div>
+                            <div className="col-span-2 flex justify-end items-center text-sm text-gray-600 dark:text-white pe-4">
+                              {param.required ? "true" : "false"}
+                            </div>
+                          </div>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </AccordionBody>
+              </Accordion>
+            </TabPanel>
+            <TabPanel>
+              <Accordion
+                open={accOpen === 2}
+                icon={<NewIcon id={2} open={accOpen} />}
+                placeholder={true}
+                onPointerEnterCapture={undefined}
+                onPointerLeaveCapture={undefined}
+              >
+                <AccordionHeader
+                  onClick={() => handleOpen(2)}
                   placeholder={true}
                   onPointerEnterCapture={undefined}
                   onPointerLeaveCapture={undefined}
@@ -387,14 +466,14 @@ const ApiDetailDrawer: FC<ApiDetailDrawerProps> = ({
                 </AccordionBody>
               </Accordion>
               <Accordion
-                open={accOpen === 2}
-                icon={<NewIcon id={2} open={accOpen} />}
+                open={accOpen === 3}
+                icon={<NewIcon id={3} open={accOpen} />}
                 placeholder={true}
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
               >
                 <AccordionHeader
-                  onClick={() => handleOpen(2)}
+                  onClick={() => handleOpen(3)}
                   placeholder={true}
                   onPointerEnterCapture={undefined}
                   onPointerLeaveCapture={undefined}
