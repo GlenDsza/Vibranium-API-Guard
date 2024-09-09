@@ -1,0 +1,953 @@
+[
+  {
+    "requestBody": {
+      "content": {
+        "application/json": {
+          "schemaRef": {
+            "_id": "66dc8dab0220c8952a2e19b8",
+            "name": "SignupRequest",
+            "__v": 0,
+            "createdAt": "2024-09-07T17:30:19.430Z",
+            "organization": "66d3f5019ce5c53aeb973d6e",
+            "properties": [
+              {
+                "name": "username",
+                "type": "string",
+                "title": "Username",
+                "createdAt": "2024-09-07T17:30:19.430Z",
+                "updatedAt": "2024-09-07T17:30:19.430Z"
+              },
+              {
+                "name": "email",
+                "type": "string",
+                "title": "Email",
+                "createdAt": "2024-09-07T17:30:19.430Z",
+                "updatedAt": "2024-09-07T17:30:19.430Z"
+              },
+              {
+                "name": "password",
+                "type": "string",
+                "title": "Password",
+                "createdAt": "2024-09-07T17:30:19.430Z",
+                "updatedAt": "2024-09-07T17:30:19.430Z"
+              }
+            ],
+            "required": ["username", "email", "password"],
+            "title": "SignupRequest",
+            "type": "object",
+            "updatedAt": "2024-09-07T17:30:19.430Z"
+          }
+        }
+      },
+      "required": true
+    },
+    "_id": "66dc8dab0220c8952a2e19ef",
+    "path": "/auth/signup",
+    "method": "post",
+    "__v": 0,
+    "createdAt": "2024-09-07T17:30:19.482Z",
+    "enabled": true,
+    "operationId": "signup_auth_signup_post",
+    "organization": {
+      "testingCredentials": {
+        "userId": "1",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI1ODA1OTM5fQ.8PRKAw9XLKvftYFtRm5xw8A0wzBiON6CITNTYizOGP8"
+      },
+      "_id": "66d3f5019ce5c53aeb973d6e",
+      "name": "Flipkart",
+      "description": "This is an example organization for demonstration purposes.",
+      "logo": "https://www.citypng.com/public/uploads/preview/hd-flipkart-round-logo-icon-transparent-png-701751694966204grvmunpzzf.png",
+      "blockedIps": [
+        "166.146.34.12",
+        "45.56.78.90",
+        "34.56.78.90",
+        "34.12.45.67"
+      ],
+      "createdAt": "2024-09-01T05:00:49.455Z",
+      "updatedAt": "2024-09-06T11:27:22.122Z",
+      "__v": 0
+    },
+    "parameters": [],
+    "responses": {
+      "201": {
+        "description": "User registered successfully",
+        "_id": "66dc8dab3223329cf375804c"
+      },
+      "422": {
+        "content": {
+          "application/json": {
+            "schemaRef": {
+              "_id": "66dc8dab0220c8952a2e198c",
+              "name": "HTTPValidationError",
+              "__v": 0,
+              "createdAt": "2024-09-07T17:30:19.378Z",
+              "organization": "66d3f5019ce5c53aeb973d6e",
+              "properties": [
+                {
+                  "name": "detail",
+                  "type": "array",
+                  "title": "Detail",
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationError"
+                  },
+                  "createdAt": "2024-09-07T17:30:19.378Z",
+                  "updatedAt": "2024-09-07T17:30:19.378Z"
+                }
+              ],
+              "required": [],
+              "title": "HTTPValidationError",
+              "type": "object",
+              "updatedAt": "2024-09-07T17:30:19.378Z"
+            }
+          }
+        },
+        "description": "Validation Error",
+        "_id": "66dc8dab3223329cf375804d"
+      }
+    },
+    "summary": "Signup",
+    "threats": [],
+    "updatedAt": "2024-09-08T11:26:09.160Z"
+  },
+  {
+    "_id": "66dc8dab0220c8952a2e19fd",
+    "method": "post",
+    "path": "/auth/login",
+    "__v": 0,
+    "createdAt": "2024-09-07T17:30:19.506Z",
+    "enabled": true,
+    "operationId": "login_auth_login_post",
+    "organization": {
+      "testingCredentials": {
+        "userId": "1",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI1ODA1OTM5fQ.8PRKAw9XLKvftYFtRm5xw8A0wzBiON6CITNTYizOGP8"
+      },
+      "_id": "66d3f5019ce5c53aeb973d6e",
+      "name": "Flipkart",
+      "description": "This is an example organization for demonstration purposes.",
+      "logo": "https://www.citypng.com/public/uploads/preview/hd-flipkart-round-logo-icon-transparent-png-701751694966204grvmunpzzf.png",
+      "blockedIps": [
+        "166.146.34.12",
+        "45.56.78.90",
+        "34.56.78.90",
+        "34.12.45.67"
+      ],
+      "createdAt": "2024-09-01T05:00:49.455Z",
+      "updatedAt": "2024-09-06T11:27:22.122Z",
+      "__v": 0
+    },
+    "parameters": [],
+    "responses": {
+      "200": {
+        "description": "Successful Response",
+        "_id": "66dc8dab3223329cf375804f"
+      },
+      "422": {
+        "content": {
+          "application/json": {
+            "schemaRef": {
+              "_id": "66dc8dab0220c8952a2e198c",
+              "name": "HTTPValidationError",
+              "__v": 0,
+              "createdAt": "2024-09-07T17:30:19.378Z",
+              "organization": "66d3f5019ce5c53aeb973d6e",
+              "properties": [
+                {
+                  "name": "detail",
+                  "type": "array",
+                  "title": "Detail",
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationError"
+                  },
+                  "createdAt": "2024-09-07T17:30:19.378Z",
+                  "updatedAt": "2024-09-07T17:30:19.378Z"
+                }
+              ],
+              "required": [],
+              "title": "HTTPValidationError",
+              "type": "object",
+              "updatedAt": "2024-09-07T17:30:19.378Z"
+            }
+          }
+        },
+        "description": "Validation Error",
+        "_id": "66dc8dab3223329cf3758050"
+      }
+    },
+    "summary": "Login",
+    "threats": [],
+    "updatedAt": "2024-09-08T11:26:10.394Z"
+  },
+  {
+    "_id": "66dc8dab0220c8952a2e1a08",
+    "path": "/products",
+    "method": "get",
+    "__v": 0,
+    "createdAt": "2024-09-07T17:30:19.523Z",
+    "enabled": true,
+    "operationId": "get_products_products_get",
+    "organization": {
+      "testingCredentials": {
+        "userId": "1",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI1ODA1OTM5fQ.8PRKAw9XLKvftYFtRm5xw8A0wzBiON6CITNTYizOGP8"
+      },
+      "_id": "66d3f5019ce5c53aeb973d6e",
+      "name": "Flipkart",
+      "description": "This is an example organization for demonstration purposes.",
+      "logo": "https://www.citypng.com/public/uploads/preview/hd-flipkart-round-logo-icon-transparent-png-701751694966204grvmunpzzf.png",
+      "blockedIps": [
+        "166.146.34.12",
+        "45.56.78.90",
+        "34.56.78.90",
+        "34.12.45.67"
+      ],
+      "createdAt": "2024-09-01T05:00:49.455Z",
+      "updatedAt": "2024-09-06T11:27:22.122Z",
+      "__v": 0
+    },
+    "parameters": [],
+    "responses": {
+      "200": {
+        "description": "Successful Response",
+        "_id": "66dc8dab3223329cf3758052"
+      }
+    },
+    "summary": "Get Products",
+    "threats": [],
+    "updatedAt": "2024-09-07T17:30:19.523Z"
+  },
+  {
+    "requestBody": {
+      "content": {
+        "application/json": {
+          "schemaRef": {
+            "_id": "66dc8dab0220c8952a2e19ab",
+            "name": "ProductCreate",
+            "__v": 0,
+            "createdAt": "2024-09-07T17:30:19.412Z",
+            "organization": "66d3f5019ce5c53aeb973d6e",
+            "properties": [
+              {
+                "name": "name",
+                "type": "string",
+                "title": "Name",
+                "createdAt": "2024-09-07T17:30:19.412Z",
+                "updatedAt": "2024-09-07T17:30:19.412Z"
+              },
+              {
+                "name": "description",
+                "title": "Description",
+                "anyOf": [
+                  {
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ],
+                "createdAt": "2024-09-07T17:30:19.412Z",
+                "updatedAt": "2024-09-07T17:30:19.412Z"
+              },
+              {
+                "name": "price",
+                "type": "number",
+                "title": "Price",
+                "createdAt": "2024-09-07T17:30:19.412Z",
+                "updatedAt": "2024-09-07T17:30:19.412Z"
+              },
+              {
+                "name": "stock",
+                "type": "integer",
+                "title": "Stock",
+                "createdAt": "2024-09-07T17:30:19.412Z",
+                "updatedAt": "2024-09-07T17:30:19.412Z"
+              }
+            ],
+            "required": ["name", "description", "price", "stock"],
+            "title": "ProductCreate",
+            "type": "object",
+            "updatedAt": "2024-09-07T17:30:19.412Z"
+          }
+        }
+      },
+      "required": true
+    },
+    "_id": "66dc8dab0220c8952a2e1a13",
+    "method": "post",
+    "path": "/products",
+    "__v": 0,
+    "createdAt": "2024-09-07T17:30:19.537Z",
+    "enabled": true,
+    "operationId": "create_product_products_post",
+    "organization": {
+      "testingCredentials": {
+        "userId": "1",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI1ODA1OTM5fQ.8PRKAw9XLKvftYFtRm5xw8A0wzBiON6CITNTYizOGP8"
+      },
+      "_id": "66d3f5019ce5c53aeb973d6e",
+      "name": "Flipkart",
+      "description": "This is an example organization for demonstration purposes.",
+      "logo": "https://www.citypng.com/public/uploads/preview/hd-flipkart-round-logo-icon-transparent-png-701751694966204grvmunpzzf.png",
+      "blockedIps": [
+        "166.146.34.12",
+        "45.56.78.90",
+        "34.56.78.90",
+        "34.12.45.67"
+      ],
+      "createdAt": "2024-09-01T05:00:49.455Z",
+      "updatedAt": "2024-09-06T11:27:22.122Z",
+      "__v": 0
+    },
+    "parameters": [],
+    "responses": {
+      "200": {
+        "content": {
+          "application/json": {
+            "schemaRef": {
+              "_id": "66dc8dab0220c8952a2e19ab",
+              "name": "ProductCreate",
+              "__v": 0,
+              "createdAt": "2024-09-07T17:30:19.412Z",
+              "organization": "66d3f5019ce5c53aeb973d6e",
+              "properties": [
+                {
+                  "name": "name",
+                  "type": "string",
+                  "title": "Name",
+                  "createdAt": "2024-09-07T17:30:19.412Z",
+                  "updatedAt": "2024-09-07T17:30:19.412Z"
+                },
+                {
+                  "name": "description",
+                  "title": "Description",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "createdAt": "2024-09-07T17:30:19.412Z",
+                  "updatedAt": "2024-09-07T17:30:19.412Z"
+                },
+                {
+                  "name": "price",
+                  "type": "number",
+                  "title": "Price",
+                  "createdAt": "2024-09-07T17:30:19.412Z",
+                  "updatedAt": "2024-09-07T17:30:19.412Z"
+                },
+                {
+                  "name": "stock",
+                  "type": "integer",
+                  "title": "Stock",
+                  "createdAt": "2024-09-07T17:30:19.412Z",
+                  "updatedAt": "2024-09-07T17:30:19.412Z"
+                }
+              ],
+              "required": ["name", "description", "price", "stock"],
+              "title": "ProductCreate",
+              "type": "object",
+              "updatedAt": "2024-09-07T17:30:19.412Z"
+            }
+          }
+        },
+        "description": "Successful Response",
+        "_id": "66dc8dab3223329cf3758054"
+      },
+      "422": {
+        "content": {
+          "application/json": {
+            "schemaRef": {
+              "_id": "66dc8dab0220c8952a2e198c",
+              "name": "HTTPValidationError",
+              "__v": 0,
+              "createdAt": "2024-09-07T17:30:19.378Z",
+              "organization": "66d3f5019ce5c53aeb973d6e",
+              "properties": [
+                {
+                  "name": "detail",
+                  "type": "array",
+                  "title": "Detail",
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationError"
+                  },
+                  "createdAt": "2024-09-07T17:30:19.378Z",
+                  "updatedAt": "2024-09-07T17:30:19.378Z"
+                }
+              ],
+              "required": [],
+              "title": "HTTPValidationError",
+              "type": "object",
+              "updatedAt": "2024-09-07T17:30:19.378Z"
+            }
+          }
+        },
+        "description": "Validation Error",
+        "_id": "66dc8dab3223329cf3758055"
+      }
+    },
+    "summary": "Create Product",
+    "threats": [],
+    "updatedAt": "2024-09-08T15:12:26.668Z"
+  },
+  {
+    "_id": "66dc8dab0220c8952a2e1a21",
+    "path": "/products/{product_id}",
+    "method": "get",
+    "__v": 0,
+    "createdAt": "2024-09-07T17:30:19.554Z",
+    "enabled": true,
+    "operationId": "get_product_products__product_id__get",
+    "organization": {
+      "testingCredentials": {
+        "userId": "1",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI1ODA1OTM5fQ.8PRKAw9XLKvftYFtRm5xw8A0wzBiON6CITNTYizOGP8"
+      },
+      "_id": "66d3f5019ce5c53aeb973d6e",
+      "name": "Flipkart",
+      "description": "This is an example organization for demonstration purposes.",
+      "logo": "https://www.citypng.com/public/uploads/preview/hd-flipkart-round-logo-icon-transparent-png-701751694966204grvmunpzzf.png",
+      "blockedIps": [
+        "166.146.34.12",
+        "45.56.78.90",
+        "34.56.78.90",
+        "34.12.45.67"
+      ],
+      "createdAt": "2024-09-01T05:00:49.455Z",
+      "updatedAt": "2024-09-06T11:27:22.122Z",
+      "__v": 0
+    },
+    "parameters": [
+      {
+        "schemaRef": {
+          "type": "integer",
+          "title": "Product Id"
+        },
+        "name": "product_id",
+        "in": "path",
+        "required": true,
+        "createdAt": "2024-09-07T17:30:19.554Z",
+        "updatedAt": "2024-09-07T17:30:19.554Z"
+      }
+    ],
+    "responses": {
+      "200": {
+        "content": {
+          "application/json": {
+            "schemaRef": {
+              "_id": "66dc8dab0220c8952a2e19ab",
+              "name": "ProductCreate",
+              "__v": 0,
+              "createdAt": "2024-09-07T17:30:19.412Z",
+              "organization": "66d3f5019ce5c53aeb973d6e",
+              "properties": [
+                {
+                  "name": "name",
+                  "type": "string",
+                  "title": "Name",
+                  "createdAt": "2024-09-07T17:30:19.412Z",
+                  "updatedAt": "2024-09-07T17:30:19.412Z"
+                },
+                {
+                  "name": "description",
+                  "title": "Description",
+                  "anyOf": [
+                    {
+                      "type": "string"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "createdAt": "2024-09-07T17:30:19.412Z",
+                  "updatedAt": "2024-09-07T17:30:19.412Z"
+                },
+                {
+                  "name": "price",
+                  "type": "number",
+                  "title": "Price",
+                  "createdAt": "2024-09-07T17:30:19.412Z",
+                  "updatedAt": "2024-09-07T17:30:19.412Z"
+                },
+                {
+                  "name": "stock",
+                  "type": "integer",
+                  "title": "Stock",
+                  "createdAt": "2024-09-07T17:30:19.412Z",
+                  "updatedAt": "2024-09-07T17:30:19.412Z"
+                }
+              ],
+              "required": ["name", "description", "price", "stock"],
+              "title": "ProductCreate",
+              "type": "object",
+              "updatedAt": "2024-09-07T17:30:19.412Z"
+            }
+          }
+        },
+        "description": "Successful Response",
+        "_id": "66dc8dab3223329cf3758057"
+      },
+      "422": {
+        "content": {
+          "application/json": {
+            "schemaRef": {
+              "_id": "66dc8dab0220c8952a2e198c",
+              "name": "HTTPValidationError",
+              "__v": 0,
+              "createdAt": "2024-09-07T17:30:19.378Z",
+              "organization": "66d3f5019ce5c53aeb973d6e",
+              "properties": [
+                {
+                  "name": "detail",
+                  "type": "array",
+                  "title": "Detail",
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationError"
+                  },
+                  "createdAt": "2024-09-07T17:30:19.378Z",
+                  "updatedAt": "2024-09-07T17:30:19.378Z"
+                }
+              ],
+              "required": [],
+              "title": "HTTPValidationError",
+              "type": "object",
+              "updatedAt": "2024-09-07T17:30:19.378Z"
+            }
+          }
+        },
+        "description": "Validation Error",
+        "_id": "66dc8dab3223329cf3758058"
+      }
+    },
+    "summary": "Get Product",
+    "threats": [],
+    "updatedAt": "2024-09-07T17:30:19.554Z"
+  },
+  {
+    "_id": "66dc8dab0220c8952a2e1a2c",
+    "method": "get",
+    "path": "/cart/{uid}",
+    "__v": 0,
+    "createdAt": "2024-09-07T17:30:19.573Z",
+    "enabled": true,
+    "operationId": "get_cart_cart__uid__get",
+    "organization": {
+      "testingCredentials": {
+        "userId": "1",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI1ODA1OTM5fQ.8PRKAw9XLKvftYFtRm5xw8A0wzBiON6CITNTYizOGP8"
+      },
+      "_id": "66d3f5019ce5c53aeb973d6e",
+      "name": "Flipkart",
+      "description": "This is an example organization for demonstration purposes.",
+      "logo": "https://www.citypng.com/public/uploads/preview/hd-flipkart-round-logo-icon-transparent-png-701751694966204grvmunpzzf.png",
+      "blockedIps": [
+        "166.146.34.12",
+        "45.56.78.90",
+        "34.56.78.90",
+        "34.12.45.67"
+      ],
+      "createdAt": "2024-09-01T05:00:49.455Z",
+      "updatedAt": "2024-09-06T11:27:22.122Z",
+      "__v": 0
+    },
+    "parameters": [
+      {
+        "schemaRef": {
+          "type": "integer",
+          "title": "Uid"
+        },
+        "name": "uid",
+        "in": "path",
+        "required": true,
+        "createdAt": "2024-09-07T17:30:19.573Z",
+        "updatedAt": "2024-09-07T17:30:19.573Z"
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "Successful Response",
+        "_id": "66dc8dab3223329cf375805a"
+      },
+      "422": {
+        "content": {
+          "application/json": {
+            "schemaRef": {
+              "_id": "66dc8dab0220c8952a2e198c",
+              "name": "HTTPValidationError",
+              "__v": 0,
+              "createdAt": "2024-09-07T17:30:19.378Z",
+              "organization": "66d3f5019ce5c53aeb973d6e",
+              "properties": [
+                {
+                  "name": "detail",
+                  "type": "array",
+                  "title": "Detail",
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationError"
+                  },
+                  "createdAt": "2024-09-07T17:30:19.378Z",
+                  "updatedAt": "2024-09-07T17:30:19.378Z"
+                }
+              ],
+              "required": [],
+              "title": "HTTPValidationError",
+              "type": "object",
+              "updatedAt": "2024-09-07T17:30:19.378Z"
+            }
+          }
+        },
+        "description": "Validation Error",
+        "_id": "66dc8dab3223329cf375805b"
+      }
+    },
+    "summary": "Get Cart",
+    "threats": [],
+    "updatedAt": "2024-09-07T17:30:19.573Z"
+  },
+  {
+    "requestBody": {
+      "content": {
+        "application/json": {
+          "schemaRef": {
+            "_id": "66dc8dab0220c8952a2e197f",
+            "name": "CartItemCreate",
+            "__v": 0,
+            "createdAt": "2024-09-07T17:30:19.362Z",
+            "organization": "66d3f5019ce5c53aeb973d6e",
+            "properties": [
+              {
+                "name": "product_id",
+                "type": "integer",
+                "title": "Product Id",
+                "createdAt": "2024-09-07T17:30:19.362Z",
+                "updatedAt": "2024-09-07T17:30:19.362Z"
+              },
+              {
+                "name": "quantity",
+                "type": "integer",
+                "title": "Quantity",
+                "createdAt": "2024-09-07T17:30:19.362Z",
+                "updatedAt": "2024-09-07T17:30:19.362Z"
+              }
+            ],
+            "required": ["product_id", "quantity"],
+            "title": "CartItemCreate",
+            "type": "object",
+            "updatedAt": "2024-09-07T17:30:19.362Z"
+          }
+        }
+      },
+      "required": true
+    },
+    "_id": "66dc8dab0220c8952a2e1a38",
+    "method": "post",
+    "path": "/cart",
+    "__v": 0,
+    "createdAt": "2024-09-07T17:30:19.596Z",
+    "enabled": true,
+    "operationId": "add_to_cart_cart_post",
+    "organization": {
+      "testingCredentials": {
+        "userId": "1",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI1ODA1OTM5fQ.8PRKAw9XLKvftYFtRm5xw8A0wzBiON6CITNTYizOGP8"
+      },
+      "_id": "66d3f5019ce5c53aeb973d6e",
+      "name": "Flipkart",
+      "description": "This is an example organization for demonstration purposes.",
+      "logo": "https://www.citypng.com/public/uploads/preview/hd-flipkart-round-logo-icon-transparent-png-701751694966204grvmunpzzf.png",
+      "blockedIps": [
+        "166.146.34.12",
+        "45.56.78.90",
+        "34.56.78.90",
+        "34.12.45.67"
+      ],
+      "createdAt": "2024-09-01T05:00:49.455Z",
+      "updatedAt": "2024-09-06T11:27:22.122Z",
+      "__v": 0
+    },
+    "parameters": [],
+    "responses": {
+      "201": {
+        "description": "Item added to cart",
+        "_id": "66dc8dab3223329cf375805d"
+      },
+      "422": {
+        "content": {
+          "application/json": {
+            "schemaRef": {
+              "_id": "66dc8dab0220c8952a2e198c",
+              "name": "HTTPValidationError",
+              "__v": 0,
+              "createdAt": "2024-09-07T17:30:19.378Z",
+              "organization": "66d3f5019ce5c53aeb973d6e",
+              "properties": [
+                {
+                  "name": "detail",
+                  "type": "array",
+                  "title": "Detail",
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationError"
+                  },
+                  "createdAt": "2024-09-07T17:30:19.378Z",
+                  "updatedAt": "2024-09-07T17:30:19.378Z"
+                }
+              ],
+              "required": [],
+              "title": "HTTPValidationError",
+              "type": "object",
+              "updatedAt": "2024-09-07T17:30:19.378Z"
+            }
+          }
+        },
+        "description": "Validation Error",
+        "_id": "66dc8dab3223329cf375805e"
+      }
+    },
+    "summary": "Add To Cart",
+    "threats": [],
+    "updatedAt": "2024-09-07T17:30:19.596Z"
+  },
+  {
+    "_id": "66dc8dab0220c8952a2e1a45",
+    "method": "get",
+    "path": "/orders",
+    "__v": 0,
+    "createdAt": "2024-09-07T17:30:19.609Z",
+    "enabled": true,
+    "operationId": "get_orders_orders_get",
+    "organization": {
+      "testingCredentials": {
+        "userId": "1",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI1ODA1OTM5fQ.8PRKAw9XLKvftYFtRm5xw8A0wzBiON6CITNTYizOGP8"
+      },
+      "_id": "66d3f5019ce5c53aeb973d6e",
+      "name": "Flipkart",
+      "description": "This is an example organization for demonstration purposes.",
+      "logo": "https://www.citypng.com/public/uploads/preview/hd-flipkart-round-logo-icon-transparent-png-701751694966204grvmunpzzf.png",
+      "blockedIps": [
+        "166.146.34.12",
+        "45.56.78.90",
+        "34.56.78.90",
+        "34.12.45.67"
+      ],
+      "createdAt": "2024-09-01T05:00:49.455Z",
+      "updatedAt": "2024-09-06T11:27:22.122Z",
+      "__v": 0
+    },
+    "parameters": [],
+    "responses": {
+      "200": {
+        "description": "Successful Response",
+        "_id": "66dc8dab3223329cf3758060"
+      }
+    },
+    "summary": "Get Orders",
+    "threats": [],
+    "updatedAt": "2024-09-07T17:30:19.609Z"
+  },
+  {
+    "requestBody": {
+      "content": {
+        "application/json": {
+          "schemaRef": {
+            "_id": "66dc8dab0220c8952a2e199e",
+            "name": "OrderCreate",
+            "__v": 0,
+            "createdAt": "2024-09-07T17:30:19.395Z",
+            "organization": "66d3f5019ce5c53aeb973d6e",
+            "properties": [
+              {
+                "name": "address",
+                "type": "string",
+                "title": "Address",
+                "createdAt": "2024-09-07T17:30:19.395Z",
+                "updatedAt": "2024-09-07T17:30:19.395Z"
+              }
+            ],
+            "required": ["address"],
+            "title": "OrderCreate",
+            "type": "object",
+            "updatedAt": "2024-09-07T17:30:19.395Z"
+          }
+        }
+      },
+      "required": true
+    },
+    "_id": "66dc8dab0220c8952a2e1a5d",
+    "method": "post",
+    "path": "/orders",
+    "__v": 0,
+    "createdAt": "2024-09-07T17:30:19.627Z",
+    "enabled": true,
+    "operationId": "place_order_orders_post",
+    "organization": {
+      "testingCredentials": {
+        "userId": "1",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI1ODA1OTM5fQ.8PRKAw9XLKvftYFtRm5xw8A0wzBiON6CITNTYizOGP8"
+      },
+      "_id": "66d3f5019ce5c53aeb973d6e",
+      "name": "Flipkart",
+      "description": "This is an example organization for demonstration purposes.",
+      "logo": "https://www.citypng.com/public/uploads/preview/hd-flipkart-round-logo-icon-transparent-png-701751694966204grvmunpzzf.png",
+      "blockedIps": [
+        "166.146.34.12",
+        "45.56.78.90",
+        "34.56.78.90",
+        "34.12.45.67"
+      ],
+      "createdAt": "2024-09-01T05:00:49.455Z",
+      "updatedAt": "2024-09-06T11:27:22.122Z",
+      "__v": 0
+    },
+    "parameters": [],
+    "responses": {
+      "200": {
+        "content": {
+          "application/json": {
+            "schemaRef": {
+              "_id": "66dc8dab0220c8952a2e199e",
+              "name": "OrderCreate",
+              "__v": 0,
+              "createdAt": "2024-09-07T17:30:19.395Z",
+              "organization": "66d3f5019ce5c53aeb973d6e",
+              "properties": [
+                {
+                  "name": "address",
+                  "type": "string",
+                  "title": "Address",
+                  "createdAt": "2024-09-07T17:30:19.395Z",
+                  "updatedAt": "2024-09-07T17:30:19.395Z"
+                }
+              ],
+              "required": ["address"],
+              "title": "OrderCreate",
+              "type": "object",
+              "updatedAt": "2024-09-07T17:30:19.395Z"
+            }
+          }
+        },
+        "description": "Order placed successfully",
+        "_id": "66dc8dab3223329cf3758062"
+      },
+      "422": {
+        "content": {
+          "application/json": {
+            "schemaRef": {
+              "_id": "66dc8dab0220c8952a2e198c",
+              "name": "HTTPValidationError",
+              "__v": 0,
+              "createdAt": "2024-09-07T17:30:19.378Z",
+              "organization": "66d3f5019ce5c53aeb973d6e",
+              "properties": [
+                {
+                  "name": "detail",
+                  "type": "array",
+                  "title": "Detail",
+                  "items": {
+                    "$ref": "#/components/schemas/ValidationError"
+                  },
+                  "createdAt": "2024-09-07T17:30:19.378Z",
+                  "updatedAt": "2024-09-07T17:30:19.378Z"
+                }
+              ],
+              "required": [],
+              "title": "HTTPValidationError",
+              "type": "object",
+              "updatedAt": "2024-09-07T17:30:19.378Z"
+            }
+          }
+        },
+        "description": "Validation Error",
+        "_id": "66dc8dab3223329cf3758063"
+      }
+    },
+    "summary": "Place Order",
+    "threats": [],
+    "updatedAt": "2024-09-07T17:30:19.627Z"
+  },
+  {
+    "_id": "66dc8dab0220c8952a2e1a6a",
+    "path": "/users/me",
+    "method": "get",
+    "__v": 0,
+    "createdAt": "2024-09-07T17:30:19.643Z",
+    "enabled": true,
+    "operationId": "read_user_me_users_me_get",
+    "organization": {
+      "testingCredentials": {
+        "userId": "1",
+        "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huQGV4YW1wbGUuY29tIiwiZXhwIjoxNzI1ODA1OTM5fQ.8PRKAw9XLKvftYFtRm5xw8A0wzBiON6CITNTYizOGP8"
+      },
+      "_id": "66d3f5019ce5c53aeb973d6e",
+      "name": "Flipkart",
+      "description": "This is an example organization for demonstration purposes.",
+      "logo": "https://www.citypng.com/public/uploads/preview/hd-flipkart-round-logo-icon-transparent-png-701751694966204grvmunpzzf.png",
+      "blockedIps": [
+        "166.146.34.12",
+        "45.56.78.90",
+        "34.56.78.90",
+        "34.12.45.67"
+      ],
+      "createdAt": "2024-09-01T05:00:49.455Z",
+      "updatedAt": "2024-09-06T11:27:22.122Z",
+      "__v": 0
+    },
+    "parameters": [],
+    "responses": {
+      "200": {
+        "content": {
+          "application/json": {
+            "schemaRef": {
+              "_id": "66dc8dab0220c8952a2e19c7",
+              "name": "UserResponse",
+              "__v": 0,
+              "createdAt": "2024-09-07T17:30:19.446Z",
+              "organization": "66d3f5019ce5c53aeb973d6e",
+              "properties": [
+                {
+                  "name": "id",
+                  "type": "integer",
+                  "title": "Id",
+                  "createdAt": "2024-09-07T17:30:19.446Z",
+                  "updatedAt": "2024-09-07T17:30:19.446Z"
+                },
+                {
+                  "name": "username",
+                  "type": "string",
+                  "title": "Username",
+                  "createdAt": "2024-09-07T17:30:19.446Z",
+                  "updatedAt": "2024-09-07T17:30:19.446Z"
+                },
+                {
+                  "name": "email",
+                  "type": "string",
+                  "title": "Email",
+                  "createdAt": "2024-09-07T17:30:19.446Z",
+                  "updatedAt": "2024-09-07T17:30:19.446Z"
+                },
+                {
+                  "name": "hashed_password",
+                  "type": "string",
+                  "title": "Hashed Password",
+                  "createdAt": "2024-09-07T17:30:19.446Z",
+                  "updatedAt": "2024-09-07T17:30:19.446Z"
+                }
+              ],
+              "required": ["id", "username", "email", "hashed_password"],
+              "title": "UserResponse",
+              "type": "object",
+              "updatedAt": "2024-09-07T17:30:19.446Z"
+            }
+          }
+        },
+        "description": "Successful Response",
+        "_id": "66dc8dab3223329cf3758065"
+      }
+    },
+    "summary": "Read User Me",
+    "threats": [],
+    "updatedAt": "2024-09-07T17:30:19.643Z"
+  }
+]

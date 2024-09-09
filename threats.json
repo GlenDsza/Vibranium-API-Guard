@@ -1,0 +1,386 @@
+[
+  {
+    "_id": "66ddac768ae6d077289d9775",
+    "endpoint": {
+      "_id": "66dc8dab0220c8952a2e1a21",
+      "path": "/products/{product_id}",
+      "method": "get",
+      "__v": 0,
+      "createdAt": "2024-09-07T17:30:19.554Z",
+      "enabled": true,
+      "operationId": "get_product_products__product_id__get",
+      "organization": "66d3f5019ce5c53aeb973d6e",
+      "parameters": [
+        {
+          "schemaRef": {
+            "type": "integer",
+            "title": "Product Id"
+          },
+          "name": "product_id",
+          "in": "path",
+          "required": true,
+          "createdAt": "2024-09-07T17:30:19.554Z",
+          "updatedAt": "2024-09-07T17:30:19.554Z"
+        }
+      ],
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schemaRef": "66dc8dab0220c8952a2e19ab"
+            }
+          },
+          "description": "Successful Response",
+          "_id": "66dc8dab3223329cf3758057"
+        },
+        "422": {
+          "content": {
+            "application/json": {
+              "schemaRef": "66dc8dab0220c8952a2e198c"
+            }
+          },
+          "description": "Validation Error",
+          "_id": "66dc8dab3223329cf3758058"
+        }
+      },
+      "summary": "Get Product",
+      "threats": [],
+      "updatedAt": "2024-09-07T17:30:19.554Z"
+    },
+    "name": "Broken Authentication",
+    "description": "Broken Authentication vulnerability found",
+    "type": "Authentication",
+    "severity": "High",
+    "recommendations": "Secure endpoint with token based authentication",
+    "status": "Pending",
+    "createdAt": "2024-09-08T13:53:58.276Z",
+    "updatedAt": "2024-09-08T13:53:58.276Z",
+    "__v": 0
+  },
+  {
+    "_id": "66ddacb48ae6d077289d9781",
+    "endpoint": {
+      "_id": "66dc8dab0220c8952a2e1a21",
+      "path": "/products/{product_id}",
+      "method": "get",
+      "__v": 0,
+      "createdAt": "2024-09-07T17:30:19.554Z",
+      "enabled": true,
+      "operationId": "get_product_products__product_id__get",
+      "organization": "66d3f5019ce5c53aeb973d6e",
+      "parameters": [
+        {
+          "schemaRef": {
+            "type": "integer",
+            "title": "Product Id"
+          },
+          "name": "product_id",
+          "in": "path",
+          "required": true,
+          "createdAt": "2024-09-07T17:30:19.554Z",
+          "updatedAt": "2024-09-07T17:30:19.554Z"
+        }
+      ],
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schemaRef": "66dc8dab0220c8952a2e19ab"
+            }
+          },
+          "description": "Successful Response",
+          "_id": "66dc8dab3223329cf3758057"
+        },
+        "422": {
+          "content": {
+            "application/json": {
+              "schemaRef": "66dc8dab0220c8952a2e198c"
+            }
+          },
+          "description": "Validation Error",
+          "_id": "66dc8dab3223329cf3758058"
+        }
+      },
+      "summary": "Get Product",
+      "threats": [],
+      "updatedAt": "2024-09-07T17:30:19.554Z"
+    },
+    "name": "Security Headers",
+    "description": "Security headers missing",
+    "type": "Security",
+    "severity": "Medium",
+    "recommendations": "Add required security headers",
+    "status": "Pending",
+    "createdAt": "2024-09-08T13:55:00.424Z",
+    "updatedAt": "2024-09-08T13:55:00.424Z",
+    "__v": 0
+  },
+  {
+    "_id": "66ddafac67c643ed63adba05",
+    "endpoint": {
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schemaRef": "66dc8dab0220c8952a2e199e"
+          }
+        },
+        "required": true
+      },
+      "_id": "66dc8dab0220c8952a2e1a5d",
+      "method": "post",
+      "path": "/orders",
+      "__v": 0,
+      "createdAt": "2024-09-07T17:30:19.627Z",
+      "enabled": true,
+      "operationId": "place_order_orders_post",
+      "organization": "66d3f5019ce5c53aeb973d6e",
+      "parameters": [],
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schemaRef": "66dc8dab0220c8952a2e199e"
+            }
+          },
+          "description": "Order placed successfully",
+          "_id": "66dc8dab3223329cf3758062"
+        },
+        "422": {
+          "content": {
+            "application/json": {
+              "schemaRef": "66dc8dab0220c8952a2e198c"
+            }
+          },
+          "description": "Validation Error",
+          "_id": "66dc8dab3223329cf3758063"
+        }
+      },
+      "summary": "Place Order",
+      "threats": [],
+      "updatedAt": "2024-09-07T17:30:19.627Z"
+    },
+    "name": "Security Headers",
+    "description": "Security headers missing",
+    "type": "Security",
+    "severity": "Medium",
+    "recommendations": "Add required security headers",
+    "status": "Pending",
+    "createdAt": "2024-09-08T14:07:40.916Z",
+    "updatedAt": "2024-09-08T14:07:40.916Z",
+    "__v": 0
+  },
+  {
+    "_id": "66ddafad67c643ed63adba08",
+    "endpoint": {
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schemaRef": "66dc8dab0220c8952a2e199e"
+          }
+        },
+        "required": true
+      },
+      "_id": "66dc8dab0220c8952a2e1a5d",
+      "method": "post",
+      "path": "/orders",
+      "__v": 0,
+      "createdAt": "2024-09-07T17:30:19.627Z",
+      "enabled": true,
+      "operationId": "place_order_orders_post",
+      "organization": "66d3f5019ce5c53aeb973d6e",
+      "parameters": [],
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schemaRef": "66dc8dab0220c8952a2e199e"
+            }
+          },
+          "description": "Order placed successfully",
+          "_id": "66dc8dab3223329cf3758062"
+        },
+        "422": {
+          "content": {
+            "application/json": {
+              "schemaRef": "66dc8dab0220c8952a2e198c"
+            }
+          },
+          "description": "Validation Error",
+          "_id": "66dc8dab3223329cf3758063"
+        }
+      },
+      "summary": "Place Order",
+      "threats": [],
+      "updatedAt": "2024-09-07T17:30:19.627Z"
+    },
+    "name": "Unrestricted Resource Consumption",
+    "description": "Parameter limit vulnerability found",
+    "type": "Unrestricted Resource Consumption",
+    "severity": "Medium",
+    "recommendations": "Limit the size of request parameters",
+    "status": "Pending",
+    "createdAt": "2024-09-08T14:07:41.046Z",
+    "updatedAt": "2024-09-08T14:07:41.046Z",
+    "__v": 0
+  },
+  {
+    "_id": "66ddb625ac4bd3436446d1ee",
+    "endpoint": {
+      "_id": "66dc8dab0220c8952a2e1a2c",
+      "method": "get",
+      "path": "/cart/{uid}",
+      "__v": 0,
+      "createdAt": "2024-09-07T17:30:19.573Z",
+      "enabled": true,
+      "operationId": "get_cart_cart__uid__get",
+      "organization": "66d3f5019ce5c53aeb973d6e",
+      "parameters": [
+        {
+          "schemaRef": {
+            "type": "integer",
+            "title": "Uid"
+          },
+          "name": "uid",
+          "in": "path",
+          "required": true,
+          "createdAt": "2024-09-07T17:30:19.573Z",
+          "updatedAt": "2024-09-07T17:30:19.573Z"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful Response",
+          "_id": "66dc8dab3223329cf375805a"
+        },
+        "422": {
+          "content": {
+            "application/json": {
+              "schemaRef": "66dc8dab0220c8952a2e198c"
+            }
+          },
+          "description": "Validation Error",
+          "_id": "66dc8dab3223329cf375805b"
+        }
+      },
+      "summary": "Get Cart",
+      "threats": [],
+      "updatedAt": "2024-09-07T17:30:19.573Z"
+    },
+    "name": "Broken Authentication",
+    "description": "Broken Authentication vulnerability found",
+    "type": "Authentication",
+    "severity": "High",
+    "recommendations": "Secure endpoint with token based authentication",
+    "status": "Pending",
+    "createdAt": "2024-09-08T14:35:17.523Z",
+    "updatedAt": "2024-09-08T14:35:17.523Z",
+    "__v": 0
+  },
+  {
+    "_id": "66ddbede086529ee5a06280f",
+    "endpoint": {
+      "requestBody": {
+        "content": {
+          "application/json": {
+            "schemaRef": "66dc8dab0220c8952a2e19ab"
+          }
+        },
+        "required": true
+      },
+      "_id": "66dc8dab0220c8952a2e1a13",
+      "method": "post",
+      "path": "/products",
+      "__v": 0,
+      "createdAt": "2024-09-07T17:30:19.537Z",
+      "enabled": true,
+      "operationId": "create_product_products_post",
+      "organization": "66d3f5019ce5c53aeb973d6e",
+      "parameters": [],
+      "responses": {
+        "200": {
+          "content": {
+            "application/json": {
+              "schemaRef": "66dc8dab0220c8952a2e19ab"
+            }
+          },
+          "description": "Successful Response",
+          "_id": "66dc8dab3223329cf3758054"
+        },
+        "422": {
+          "content": {
+            "application/json": {
+              "schemaRef": "66dc8dab0220c8952a2e198c"
+            }
+          },
+          "description": "Validation Error",
+          "_id": "66dc8dab3223329cf3758055"
+        }
+      },
+      "summary": "Create Product",
+      "threats": [],
+      "updatedAt": "2024-09-08T15:12:26.668Z"
+    },
+    "name": "Security Headers",
+    "description": "Security headers missing",
+    "type": "Security",
+    "severity": "Medium",
+    "recommendations": "Add required security headers",
+    "status": "Pending",
+    "createdAt": "2024-09-08T15:12:30.395Z",
+    "updatedAt": "2024-09-08T15:12:30.395Z",
+    "__v": 0
+  },
+  {
+    "_id": "66dde15d8ca894c51a98724b",
+    "endpoint": {
+      "_id": "66dc8dab0220c8952a2e1a2c",
+      "method": "get",
+      "path": "/cart/{uid}",
+      "__v": 0,
+      "createdAt": "2024-09-07T17:30:19.573Z",
+      "enabled": true,
+      "operationId": "get_cart_cart__uid__get",
+      "organization": "66d3f5019ce5c53aeb973d6e",
+      "parameters": [
+        {
+          "schemaRef": {
+            "type": "integer",
+            "title": "Uid"
+          },
+          "name": "uid",
+          "in": "path",
+          "required": true,
+          "createdAt": "2024-09-07T17:30:19.573Z",
+          "updatedAt": "2024-09-07T17:30:19.573Z"
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Successful Response",
+          "_id": "66dc8dab3223329cf375805a"
+        },
+        "422": {
+          "content": {
+            "application/json": {
+              "schemaRef": "66dc8dab0220c8952a2e198c"
+            }
+          },
+          "description": "Validation Error",
+          "_id": "66dc8dab3223329cf375805b"
+        }
+      },
+      "summary": "Get Cart",
+      "threats": [],
+      "updatedAt": "2024-09-07T17:30:19.573Z"
+    },
+    "name": "BOLA",
+    "description": "BOLA vulnerability found",
+    "type": "Authorization",
+    "severity": "High",
+    "recommendations": "Implement user specific authorization checks",
+    "status": "Pending",
+    "createdAt": "2024-09-08T17:39:41.195Z",
+    "updatedAt": "2024-09-08T17:39:41.195Z",
+    "__v": 0
+  }
+]
