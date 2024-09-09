@@ -9,6 +9,7 @@ import {
 } from "@material-tailwind/react";
 
 import { BiCollection } from "react-icons/bi";
+import { MdDelete } from "react-icons/md";
 import { useDisclosure } from "@chakra-ui/hooks";
 import CollectionModal from "./components/CollectionModal";
 import axios from "axios";
@@ -133,10 +134,21 @@ const Collections = () => {
                 onPointerEnterCapture={undefined}
                 onPointerLeaveCapture={undefined}
               >
-                <p className="ms-3 flex gap-4 items-center">
+                <div className="ms-3 flex gap-4 items-center w-[90%]">
                   <BiCollection className="h-6 w-6 " /> {item.name}
-                  {item.name==="Orders Collection" && <span className="text-xs bg-brand-400 text-white px-2 py-1 rounded-full">New</span>}
-                </p>
+                  {item.name === "Orders" && (
+                    <span className="text-xs bg-brand-400 text-white px-2 py-1 rounded-full">
+                      New
+                    </span>
+                  )}
+                </div>
+                <div className="w-[10%]">
+                  <div className="flex gap-4 items-center justify-end">
+                    <button className="text-red-600 dark:text-red-500 border-2 border-red-600 p-2 rounded-lg">
+                      <MdDelete />
+                    </button>
+                  </div>
+                </div>
               </AccordionHeader>
               <AccordionBody>
                 <EndpointTable tableData={item.endpoints} />

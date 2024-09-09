@@ -63,7 +63,7 @@ const ThreatsPieChartCategorical: FC<ThreatsPieChartCategoricalProps> = ({
     <Card extra={"w-full h-full sm:overflow-auto px-6 col-span-3"}>
       <header className="relative flex items-center justify-between pt-4">
         <div className="text-xl font-bold text-navy-700 dark:text-white">
-          Issues by Category
+          Threats by Category
         </div>
         <button
           onClick={() => {
